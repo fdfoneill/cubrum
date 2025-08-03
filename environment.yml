@@ -1,0 +1,6 @@
+name: cubrum
+channels:
+    - conda-forge
+    - nodefaults
+dependencies:
+    - networkx

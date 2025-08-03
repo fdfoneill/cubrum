@@ -1,2 +1,2 @@
 # cubrum
-Operational wargaming in the premodern age
+Operational wargaming in the premodern era
