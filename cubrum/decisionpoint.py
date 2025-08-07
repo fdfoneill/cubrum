@@ -32,6 +32,10 @@ class DecisionPoint:
         self.context.update(kwargs)
 
 
+class ArmyGathered(DecisionPoint):
+    pass 
+
+
 class ArmySighted(DecisionPoint):
     pass
 
@@ -47,7 +51,6 @@ class LetterRecieved(DecisionPoint):
 class CrossroadsReached(DecisionPoint):
     def __init__(self, crossroadsName:str, **kwargs):
         super().__init__(trigger="CrossroadsReached", crossroadsName=crossroadsName, **kwargs)
-
 
 
 class RumorRecieved(DecisionPoint):
