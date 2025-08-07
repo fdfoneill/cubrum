@@ -223,6 +223,21 @@ class TestColumnPosition(unittest.TestCase):
             np.testing.assert_allclose(column_length_before_course_change, column_position.getCurrentLength())
         except InvalidPositionError as e:
             raise e
+        
+    def testReform(self):
+        van_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Orbost", distanceToDestination=3, map=self.roads)
+        rear_position = cubrum.position.PointPosition(("Ulgis", "Nabiac"), orientation="Ulgis", distanceToDestination=1, map=self.roads)
+        column_position = cubrum.position.ColumnPosition(vanPosition=van_position, rearPosition=rear_position, waypoints=["Ulgis"], columnLength=1)
+        with self.assertRaisesRegex(InvalidPositionError, "greater than maximum length") as context:
+            column_position.validate()
+        column_position.reform()
+        try:
+            column_position.validate()
+            self.assertTrue(True)
+        except InvalidPositionError as e:
+            raise e
+
+        
 
 def main():
     log.info("Creating map")

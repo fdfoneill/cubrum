@@ -39,6 +39,15 @@ class PointPosition:
                 log.warning("position '{}' is not an edge, ignoring passed value for distanceToDestination".format(mapLocation))
             self.distanceToDestination = None
         
+    def __repr__(self):
+        if self.getPositionType()=="node":
+            self_description = "in {}".format(self.mapLocation) 
+        else:
+            destination = self.orientation 
+            origin = self.mapLocation[0] if self.mapLocation[1]==self.orientation else self.mapLocation[1]
+            self_description = "{} leagues outside {} on the road from {}".format(self.distanceToDestination, destination, origin)
+        return self_description
+
     def validate(self) -> None:
         try:
             if self.getPositionType()=="edge":
@@ -76,21 +85,36 @@ class PointPosition:
         else:
             return self.map.nodes[self.mapLocation]
 
+    def getValidOrientations(self) -> list:
+        if self.getPositionType()=="edge":
+            return list(self.mapLocation)
+        elif self.getPositionType()=="node":
+            return list(self.map.neighbors(self.mapLocation))+[self.mapLocation]
+        else:
+            raise InvalidPositionError("positionType is neither node nor edge")
+
     def setOrientation(self, orientation:str) -> None:
         self.validate()
+        assert orientation in self.getValidOrientations(), "valid orientations are {}, got '{}'".format(self.getValidOrientations(), orientation)
         try:
             if self.getPositionType()=="edge":
                 assert orientation in self.mapLocation, "node '{}' is not an endpoint of edge '{}'".format(orientation, self.mapLocation)
                 if orientation != self.orientation:
+                    new_orientation = orientation
                     new_distance_to_destination = self.getDescription()['distance'] - self.distanceToDestination
                 else:
+                    new_orientation = orientation
                     new_distance_to_destination = self.distanceToDestination
             else:
-                assert (orientation is None) or (orientation in self.map.neighbors(self.mapLocation)), "orientation '{}' is not a neighbor of mapLocation '{}'".format(orientation, self.mapLocation)
+                if orientation==self.mapLocation:
+                    new_orientation = None 
+                else:
+                    assert (orientation is None) or (orientation in self.map.neighbors(self.mapLocation)), "orientation '{}' is not a neighbor of mapLocation '{}'".format(orientation, self.mapLocation)
+                    new_orientation = orientation
                 new_distance_to_destination = self.distanceToDestination
         except AssertionError as e:
             raise InvalidActionError(e)
-        self.orientation = orientation
+        self.orientation = new_orientation
         self.distanceToDestination = new_distance_to_destination
 
     def reverseCourse(self) -> None:
@@ -136,7 +160,7 @@ class PointPosition:
                 if reached_destination.get("strongholdType"):
                     return StrongholdReached(strongholdName=reached_destination['name'], **reached_destination)
                 else:
-                    return CrossroadsReached(crossroads_name = reached_destination['name'], **reached_destination)
+                    return CrossroadsReached(crossroadsName = reached_destination['name'], **reached_destination)
             self.distanceToDestination -= distance
         else:
             # node behavior
@@ -220,6 +244,12 @@ class ColumnPosition:
         self.waypoints = (waypoints or [])
         self.waypoints = list(self.waypoints)
 
+    def __repr__(self):
+        van_description = str(self.vanPosition)
+        rear_description = str(self.rearPosition)
+        self_description = "column {} leagues long; van is {}; rear is {})".format(self.getCurrentLength(), van_description, rear_description)
+        return self_description
+
     def validate(self):
         self.vanPosition.validate()
         self.rearPosition.validate()
@@ -273,7 +303,13 @@ class ColumnPosition:
     def getCurrentLength(self) -> float:
         """Return current extent of column"""
         return self.vanPosition.getDistance(self.rearPosition)
-    
+
+    def getValidOrientations(self) -> list:
+        valid_orientations = [waypoint for waypoint in self.waypoints]
+        valid_orientations += self.vanPosition.getValidOrientations()
+        valid_orientations += self.rearPosition.getValidOrientations()
+        return list(set(valid_orientations))
+
     def reverseCourse(self) -> None:
         """Swap van and rear"""
         self.waypoints = [self.waypoints[i] for i in range(len(self.waypoints)-1,-1,-1)] # reverse list
@@ -300,6 +336,7 @@ class ColumnPosition:
         self.rearPosition = tempRear
 
     def setOrientation(self, new_orientation) -> None:
+        assert new_orientation in self.getValidOrientations(), "valid orientations are {}, got '{}'".format(self.getValidOrientations(), new_orientation)
         if new_orientation==self.vanPosition.orientation:
             # new orientation is current orientation
             pass 
@@ -335,3 +372,56 @@ class ColumnPosition:
         else:
             raise InvalidActionError("Cannot set orientation of column with vanPosition '{}', rearPosition '{}', and waypoints '{}' to '{}'".format(self.vanPosition.mapLocation, self.rearPosition.mapLocation, self.waypoints, new_orientation))
         self.validate()
+
+    def reform(self):
+        overstretch = self.getCurrentLength() - self.columnLength
+        if overstretch <=0:
+            return
+        iteration = 0
+        while overstretch > 0:
+            iteration += 1
+            log.debug("iteration {} of reforming, overstretch={}".format(iteration, overstretch))
+            arrived_somewhere = self.rearPosition.move(overstretch)
+            new_overstretch = self.getCurrentLength() - self.columnLength
+            if new_overstretch >= overstretch:
+                return InvalidPositionError("attempting to reform is making overstretch worse")
+            overstretch = new_overstretch
+            if arrived_somewhere:
+                if arrived_somewhere.name==self.vanPosition.mapLocation:
+                    log.debug("rearPosition has arrived at vanPosition")
+                    self.rearPosition.move(1) # enter the stronghold
+                    return
+                elif arrived_somewhere.name in self.waypoints:
+                    assert arrived_somewhere.name == self.waypoints[-1], "rearPosition has bypassed last waypoint somehow, waypoints={} but arrived at {}".format(self.waypoints, arrived_somewhere.name)
+                    if arrived_somewhere.name==self.vanPosition.orientation:
+                        log.debug("rearPosition has arrived at node to which column is shrinking, entering and reversing course")
+                        self.waypoints = []
+                        self.rearPosition.move(1)
+                        self.reverseCourse()
+                        continue
+                    elif len(self.waypoints)>1:
+                        self.rearPosition.move(1) # enter waypoint
+                        self.waypoints = self.waypoints[:-1] # remove waypoint
+                        self.rearPosition.setOrientation(self.waypoints[-1])
+                        self.rearPosition.move(0.015) # move out about 100 yards so we don't have van and rear in different nodes
+                        continue
+                    else:
+                        # vanPosition is at most one edge away
+                        self.waypoints = []
+                        if self.vanPosition.getPositionType()=="node":
+                            self.rearPosition.move(1) # enter node
+                            self.rearPosition.setOrientation(self.vanPosition.mapLocation)
+                            self.rearPosition.move(0.015) # move out about 100 yards so we don't have van and rear in different nodes
+                        else:
+                            self.rearPosition.move(1) # enter node
+                            for potential_orientation in self.rearPosition.getValidOrientations():
+                                if potential_orientation in self.vanPosition.mapLocation:
+                                    self.rearPosition.setOrientation(potential_orientation)
+                                    self.rearPosition.move(0.015) # move out about 100 yards so we don't have van and rear in different nodes
+                                    break
+                            else:
+                                raise InvalidPositionError("no waypoints, and valid orientations for rearPosition are {}, none of which matches vanPosition {}".format(self.rearPosition.getValidOrientations(), self.vanPosition.mapLocation))
+                else:
+                    raise InvalidPositionError("rearPosition has arrived at {} which is not in waypoints {}".format(arrived_somewhere.name, self.waypoints))
+            else:
+                pass
