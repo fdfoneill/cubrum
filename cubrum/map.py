@@ -32,10 +32,10 @@ class Map(Graph):
                 node attributes.
         """
         node_json = node_list.copy()
-        for node in node_json:
-            node[1]['name']=node[0]
         self.add_nodes_from(node_json)
         for node in self.nodes:
+            # set name
+            self.nodes[node]['name']=node
             # default supply
             if self.nodes[node].get("maxSupply") is None:
                 if self.nodes[node]['strongholdType']=="city":
