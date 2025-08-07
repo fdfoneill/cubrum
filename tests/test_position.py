@@ -7,20 +7,20 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 import numpy as np
 
-import cuprum.position
-import cuprum.map 
+import cubrum.position
+import cubrum.map 
 
-COPPERCOAST_NODES_PATH = r"C:\Users\RDGRLFDO\Documents\Cataphract\cuprum\cuprum\networkdata\coppercoast_strongholds.json"
-COPPERCOAST_ROADS_PATH = r"C:\Users\RDGRLFDO\Documents\Cataphract\cuprum\cuprum\networkdata\coppercoast_roads.json"
+COPPERCOAST_NODES_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cubrum", "mapdata", "coppercoast_strongholds.json")
+COPPERCOAST_ROADS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cubrum", "mapdata", "coppercoast_roads.json")
 
 def main():
     log.info("Creating map")
-    roads = cuprum.map.Map()
+    roads = cubrum.map.Map()
     roads.addNodesFromFile(COPPERCOAST_NODES_PATH)
     roads.addEdgesFromFile(COPPERCOAST_ROADS_PATH)
 
     log.info("Creating position")
-    p = cuprum.position.Position("Orbost", map=roads)
+    p = cubrum.position.PointPosition("Orbost", map=roads)
     speed = 1/8
 
     # log.info("Day 1, 0900: starting in {}".format(p.mapLocation))

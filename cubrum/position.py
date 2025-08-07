@@ -7,7 +7,7 @@ from .exceptions import InvalidActionError, InvalidPositionError
 from .map import Map
 
 
-class Position:
+class PointPosition:
     """The location of an Army on a Map, including marching direction
 
     ***
