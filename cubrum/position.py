@@ -2,6 +2,8 @@ import logging, os
 logging.basicConfig(level=os.environ.get("LOGLEVEL","INFO"))
 log = logging.getLogger(__name__)
 
+from typing import Union
+
 from .decisionpoint import DecisionPoint, CrossroadsReached, StrongholdReached
 from .exceptions import InvalidActionError, InvalidPositionError
 from .map import Map
@@ -24,7 +26,7 @@ class PointPosition:
         move() -> DecisionPoint
         getDistance() -> float
     """
-    def __init__(self, mapLocation:str|tuple, map:Map, orientation:str=None, distanceToDestination:float=None):
+    def __init__(self, mapLocation:Union[str, tuple], map:Map, orientation:str=None, distanceToDestination:float=None):
         self.mapLocation = mapLocation
         self.map = map
         self.orientation=orientation
@@ -129,7 +131,7 @@ class PointPosition:
             self.move(distance)
         return None
     
-    def getDistance(self, other:PointPosition) -> float:
+    def getDistance(self, other:"PointPosition") -> float:
         """Return distance in leagues along shortest route between positions"""
         self.validate()
         other.validate()

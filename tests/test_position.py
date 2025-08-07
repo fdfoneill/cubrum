@@ -2,7 +2,7 @@ import logging, os
 logging.basicConfig(level=os.environ.get("LOGLEVEL","INFO"))
 log = logging.getLogger(__name__)
 
-import sys
+import sys, unittest
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 import numpy as np
@@ -12,6 +12,21 @@ import cubrum.map
 
 COPPERCOAST_NODES_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cubrum", "mapdata", "coppercoast_strongholds.json")
 COPPERCOAST_ROADS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cubrum", "mapdata", "coppercoast_roads.json")
+
+class TestPointPosition(unittest.TestCase):
+    def setUp(self):
+        self.roads = cubrum.map.Map()
+        self.roads.addNodesFromFile(COPPERCOAST_NODES_PATH)
+        self.roads.addEdgesFromFile(COPPERCOAST_ROADS_PATH)
+
+    def testDistanceTwoPoints(self):
+        position_orbost = cubrum.position.PointPosition("Orbost", map=self.roads)
+        position_ulgis = cubrum.position.PointPosition("Ulgis", map=self.roads)
+        distance_expected = 4
+        distance_ou = position_orbost.getDistance(position_ulgis)
+        self.assertEqual(distance_expected, distance_ou)
+        distance_uo = position_ulgis.getDistance(position_orbost)
+        self.assertEqual(distance_expected, distance_uo)
 
 def main():
     log.info("Creating map")
