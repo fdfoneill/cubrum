@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Aug  3 14:32:42 2025
-
-@author: DanO
-"""
-
 import logging, os
 logging.basicConfig(level=os.environ.get("LOGLEVEL","INFO"))
 log = logging.getLogger(__name__)
@@ -84,7 +76,7 @@ class Formation:
     def getSupplyCapacity(self) -> int:
         """Calculate how much supply the formation can transport"""
         if self.cavalry:
-            warrior_capacity self.warriorCount * 75
+            warrior_capacity = self.warriorCount * 75
         else:
             warrior_capacity = self.warriorCount * 15
         wagon_capacity = self.wagonCount * 1000
@@ -93,7 +85,7 @@ class Formation:
     def getSupplyConsumption(self) -> int:
         """Calculate daily consumption of supply for the formation"""
         if self.cavalry:
-            warrior_consumption self.warriorCount * 10
+            warrior_consumption = self.warriorCount * 10
         else:
             warrior_consumption = self.warriorCount * 1
         wagon_consumption = self.wagonCount * 10
