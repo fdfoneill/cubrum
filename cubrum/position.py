@@ -4,7 +4,7 @@ log = logging.getLogger(__name__)
 
 from typing import Union
 
-from .decisionpoint import DecisionPoint, ArmyGathered, CrossroadsReached, StrongholdReached
+from .decisionpoint import DecisionPoint, ArmyGathered, CrossroadsReached, NodeOccupied, StrongholdReached
 from .exceptions import InvalidActionError, InvalidPositionError
 from .map import Map
 
@@ -93,6 +93,12 @@ class PointPosition:
         else:
             raise InvalidPositionError("positionType is neither node nor edge")
 
+    def getOrigin(self) -> str:
+        if self.getPositionType()=="node":
+            return self.mapLocation
+        else:
+            return self.mapLocation[0] if self.mapLocation[1]==self.orientation else self.mapLocation[1]
+
     def setOrientation(self, orientation:str) -> None:
         self.validate()
         assert orientation in self.getValidOrientations(), "valid orientations are {}, got '{}'".format(self.getValidOrientations(), orientation)
@@ -123,7 +129,7 @@ class PointPosition:
             raise InvalidActionError("Cannot reverse course while on a node")
         if not self.orientation:
             raise InvalidActionError("Cannot reverse course when orientation is not set")
-        new_orientation = self.mapLocation[0] if self.mapLocation[0]!=self.orientation else self.mapLocation[1]
+        new_orientation = self.getOrigin()
         new_distance_to_destination = self.getDescription()['distance'] - self.distanceToDestination
         self.setOrientation(new_orientation)
         self.distanceToDestination = new_distance_to_destination
@@ -187,7 +193,7 @@ class PointPosition:
                 return 0
             shortest_path = self.map.getShortestPath(self.mapLocation, other.mapLocation)
             path_length = self.map.getPathLength(shortest_path)
-            return path_length
+            return round(path_length, 2)
         elif (self.getPositionType()=="edge") and (other.getPositionType()=="node"): # self edge, other node
             distance_choices = []
             for node_name in self.mapLocation: # iterate over edges
@@ -198,17 +204,17 @@ class PointPosition:
                     distance_choices.append(distance_to_adjacent_node+self.distanceToDestination)
                 else:
                     distance_choices.append(distance_to_adjacent_node+(self.getDescription()['distance'] - self.distanceToDestination))
-            return distance_choices[0] if (distance_choices[0] < distance_choices[1]) else distance_choices[1]
+            return round(distance_choices[0] if (distance_choices[0] < distance_choices[1]) else distance_choices[1], 2)
         elif (self.getPositionType()=="node") and (other.getPositionType()=="edge"): # self node, other edge
             # reverse case already handled, so just switch self and other
             return other.getDistance(self)
         else: # both edges
             if set(self.mapLocation)==set(other.mapLocation): # same-edge case
                 if self.orientation==other.orientation: # same edge, pointed the same way
-                    return abs(other.distanceToDestination-self.distanceToDestination) 
+                    return round(abs(other.distanceToDestination-self.distanceToDestination), 2)
                 else: # same edge, pointed opposite ways
                     others_distance_to_self_destination = (other.getDescription()["distance"]-other.distanceToDestination)
-                    return abs(others_distance_to_self_destination-self.distanceToDestination)
+                    return round(abs(others_distance_to_self_destination-self.distanceToDestination), 2)
             distance_choices = []
             for node_name in self.mapLocation: # iterate over edges
                 node_position = PointPosition(node_name, map=self.map)
@@ -218,7 +224,7 @@ class PointPosition:
                     distance_choices.append(distance_to_adjacent_node+self.distanceToDestination)
                 else:
                     distance_choices.append(distance_to_adjacent_node+(self.getDescription()['distance'] - self.distanceToDestination))
-            return distance_choices[0] if (distance_choices[0] < distance_choices[1]) else distance_choices[1]
+            return round(distance_choices[0] if (distance_choices[0] < distance_choices[1]) else distance_choices[1], 2)
 
 
 class ColumnPosition:
@@ -241,14 +247,17 @@ class ColumnPosition:
     def __init__(self, vanPosition:PointPosition, rearPosition:PointPosition=None, columnLength:float=None, waypoints:list=None):
         self.vanPosition = vanPosition
         self.rearPosition = (rearPosition or vanPosition.copy())
-        self.columnLength = (columnLength or self.GetCurrentLength())
+        self.columnLength = (columnLength or self.getCurrentLength())
         self.waypoints = (waypoints or [])
         self.waypoints = list(self.waypoints)
 
     def __repr__(self):
         van_description = str(self.vanPosition)
         rear_description = str(self.rearPosition)
-        self_description = "column {} leagues long; van is {}; rear is {})".format(self.getCurrentLength(), van_description, rear_description)
+        if self.getCurrentLength()==0:
+            "column arrayed {}".format(van_description)
+        else:
+            self_description = "column {} leagues long; van is {}; rear is {})".format(self.getCurrentLength(), van_description, rear_description)
         return self_description
 
     def validate(self):
@@ -309,21 +318,18 @@ class ColumnPosition:
         valid_orientations += self.rearPosition.getValidOrientations()
         return list(set(valid_orientations))
 
-    def getMotion(self) -> str:
-        """Returns one of [holding, shrinking, marching]"""
+    def getMotion(self, gather_at_gates:bool=False) -> str:
+        """Returns one of [holding, gathering, regrouping, entering, marching]"""
+        self.validate()
         if (self.getCurrentLength()==0) and (self.vanPosition.orientation is None):
             return "holding"
         if len(self.waypoints) > 0:
             if self.vanPosition.orientation==self.waypoints[0]:
-                return "shrinking"
+                return "regrouping"
         if self.vanPosition.orientation is None:
-            return "shrinking"
-        if self.vanPosition.orientation==self.rearPosition.mapLocation:
-            return "shrinking"
-        if (self.vanPosition.getPositionType()=="node") and (self.vanPosition.orientation in self.rearPosition.mapLocation):
-            return "shrinking"
-        if (set(self.vanPosition.mapLocation)==set(self.rearPosition.validate)) and (self.vanPosition.orientation!=self.rearPosition.orientation):
-            return "shrinking"
+            return "entering"
+        if (self.vanPosition.distanceToDestination==0) and gather_at_gates:
+            return "gathering"
         else:
             return "marching"
 
@@ -446,9 +452,8 @@ class ColumnPosition:
             else:
                 pass
 
-    def move(self, distance:float) -> DecisionPoint:
-        # TODO: how to 'gather at the gates' for a siege????
-        if self.getMotion()=="marching": # marching behavior
+    def move(self, distance:float, gather_at_gates:bool=False) -> DecisionPoint:
+        if self.getMotion(gather_at_gates)=="marching": # marching forward normally
             if self.vanPosition.getPositionType()=="node":
                 if self.rearPosition.mapLocation==self.vanPosition.mapLocation:
                     self.rearPosition.setOrientation(self.vanPosition.orientation)
@@ -461,26 +466,100 @@ class ColumnPosition:
                 response = self.vanPosition.move(distance)
                 self.reform()
                 return response
-        elif self.getMotion()=="shrinking": # shrinking behavior 
+        elif self.getMotion(gather_at_gates)=="gathering": # accumulating on doorstep of node 
             if distance >= self.getCurrentLength():
-                if len(self.waypoints)>0:
-                    self.vanPosition.mapLocation=self.waypoints[0]
-                    self.vanPosition.orientation=None
-                    self.vanPosition.distanceToDestination=None
-                    self.rearPosition.mapLocation=self.waypoints[0]
-                    self.rearPosition.orientation=None
-                    self.rearPosition.distanceToDestination=None
-                    self.waypoints=[]
-                    return ArmyGathered(nodeName=self.vanPosition.getDescription()['name'], **self.vanPosition.getDescription())
-                elif self.vanPosition.orientation is None:
-                    self.rearPosition.mapLocation=self.vanPosition.mapLocation
-                    self.rearPosition.orientation=None 
-                    self.rearPosition.distanceToDestination = None 
-                    return ArmyGathered(nodeName=self.vanPosition.getDescription()['name'], **self.vanPosition.getDescription())
+                self.rearPosition.mapLocation=self.vanPosition.mapLocation
+                self.rearPosition.orientation=self.vanPosition.orientation
+                self.rearPosition.distanceToDestination=self.vanPosition.distanceToDestination=0
+                return ArmyGathered(self.vanPosition.orientation, self.vanPosition.getOrigin(), **PointPosition(self.vanPosition.orientation, map=self.vanPosition.map).getDescription())
             else:
-                if len(self.waypoints)>0:
-                    response = self.vanPosition.move(distance=distance)
-                    if response: # arrived at first waypoint
-                        pass
+                while distance > 0:
+                    response = self.rearPosition.move(distance)
+                    if response:
+                        if response.trigger in ["StrongholdReached", "CrossroadsReached"]:
+                            if response.name==self.vanPosition.orientation:
+                                return ArmyGathered(self.vanPosition.orientation, self.vanPosition.getOrigin(), **PointPosition(self.vanPosition.orientation, map=self.vanPosition.map).getDescription())
+                            elif response.name==self.waypoints[-1]:
+                                self.waypoints = self.waypoints[:-1]
+                                if len(self.waypoints)>1:
+                                    rear_new_destination = self.waypoints[-1]
+                                else:
+                                    rear_new_destination = self.vanPosition.mapLocation
+                                self.rearPosition.mapLocation=(rear_new_destination, response.name)
+                                self.rearPosition.setOrientation(rear_new_destination)
+                                self.rearPosition.distanceToDestination = self.rearPosition.getDescription()['distance']
+                                distance = response.remaining_movement
+                            else:
+                                raise InvalidPositionError("rearPosition reached node '{}', which is not vanPosition orientation '{}' or in waypoints {}".format(response.name, self.vanPosition.orientation, self.waypoints))
+                        else:
+                            return response 
+                    else:
+                        return
+        elif self.getMotion(gather_at_gates)=="entering": # van already in node, remainder joining them
+            if distance >= self.getCurrentLength():
+                self.rearPosition.mapLocation=self.vanPosition.mapLocation
+                self.rearPosition.orientation=None 
+                self.rearPosition.distanceToDestination = None 
+                return NodeOccupied(nodeName=self.vanPosition.getDescription()['name'], **self.vanPosition.getDescription()) 
+            else:
+                while distance > 0:
+                    response = self.rearPosition.move(distance)
+                    if response:
+                        if response.trigger in ["StrongholdReached", "CrossroadsReached"]:
+                            if response.name==self.vanPosition.mapLocation:
+                                self.rearPosition.move(1) # enter 
+                                return NodeOccupied(nodeName=self.vanPosition.getDescription()['name'], **self.vanPosition.getDescription()) 
+                            elif response.name==self.waypoints[-1]:
+                                self.waypoints = self.waypoints[:-1]
+                                if len(self.waypoints)>1:
+                                    rear_new_destination = self.waypoints[-1]
+                                else:
+                                    rear_new_destination = self.vanPosition.mapLocation
+                                self.rearPosition.mapLocation=(rear_new_destination, response.name)
+                                self.rearPosition.setOrientation(rear_new_destination)
+                                self.rearPosition.distanceToDestination = self.rearPosition.getDescription()['distance']
+                                distance = response.remaining_movement
+                            else:
+                                raise InvalidPositionError("rearPosition reached node '{}', which is not vanPosition '{}' or in waypoints {}".format(response.name, self.vanPosition.mapLocation, self.waypoints))
+                        else:
+                            return response 
+                    else:
+                        return
+        elif self.getMotion(gather_at_gates)=="regrouping": # both van and rear pulling in to waypoint
+            if distance >= self.getCurrentLength():
+                self.vanPosition.mapLocation=self.waypoints[0]
+                self.vanPosition.orientation=None
+                self.vanPosition.distanceToDestination=None
+                self.rearPosition.mapLocation=self.waypoints[0]
+                self.rearPosition.orientation=None
+                self.rearPosition.distanceToDestination=None
+                self.waypoints=[]
+                return NodeOccupied(nodeName=self.vanPosition.getDescription()['name'], **self.vanPosition.getDescription()) 
+            else: # vanPosition oriented toward first waypoint
+                response = self.vanPosition.move(distance)
+                if response:
+                    assert response.name==self.waypoints[0], "vanPosition regrouping to first waypoint but arrived at '{}' when waypoints are {}".format(response.name, self.waypoints)
+                    self.vanPosition.move(1) # enter waypoint
+                    self.waypoints= self.waypoints[1:]
+                    remaining_movement = response.remaining_movement
+                    if remaining_movement:
+                        self.move(remaining_movement, gather_at_gates)
+                    else:
+                        return
+                else:
+                    return
         else:
             raise InvalidActionError("cannot move while holding position, define an orientation")
+
+    def getValidBypasses(self):
+        if self.vanPosition.distanceToDestination>0:
+            return []
+        else:
+            return list(self.vanPosition.map.neighbors(self.vanPosition.orientation))
+
+    def bypassTo(self, bypass_name):
+        assert bypass_name in self.getValidBypasses(), "valid bypasses are {}, got '{}'".format(self.getValidBypasses(), bypass_name)
+        self.vanPosition.mapLocation=(bypass_name, self.vanPosition.orientation)
+        self.vanPosition.setOrientation(bypass_name)
+        self.vanPosition.distanceToDestination=self.vanPosition.getDescription()['distance']
+        self.reform()
