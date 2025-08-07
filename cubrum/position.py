@@ -8,12 +8,21 @@ from .map import Map
 
 
 class PointPosition:
-    """The location of an Army on a Map, including marching direction
+    """The location of a single point on a Map, including movement direction
 
     ***
     Attributes:
         mapLocation:[str, tuple]
         orientation:str
+        map:cubrum.map.Map
+
+    Methods:
+        validate() -> None
+        getPositionType() -> str
+        getDescription() -> dict
+        setOrientation() -> None
+        move() -> DecisionPoint
+        getDistance() -> float
     """
     def __init__(self, mapLocation:str|tuple, map:Map, orientation:str=None, distanceToDestination:float=None):
         self.mapLocation = mapLocation
@@ -25,10 +34,10 @@ class PointPosition:
             assert self.distanceToDestination is not None, "When mapLocation is an edge, distanceToDestination must be provided"
         else:
             if distanceToDestination:
-                log.warning("position '{}' is not an edge, ignoring passed value for edgeProgressPercent".format(mapLocation))
+                log.warning("position '{}' is not an edge, ignoring passed value for distanceToDestination".format(mapLocation))
             self.distanceToDestination = None
         
-    def validate(self):
+    def validate(self) -> None:
         try:
             if self.getPositionType()=="edge":
                 assert len(self.mapLocation)==2, "expected 2-tuple for edge, got '{}'".format(self.mapLocation)
@@ -48,19 +57,19 @@ class PointPosition:
         except AssertionError as e:
             raise InvalidPositionError(e)
         
-    def getPositionType(self):
+    def getPositionType(self) -> str:
         if type(self.mapLocation)==tuple:
             return "edge"
         else:
             return "node"
         
-    def getDescription(self):
+    def getDescription(self) -> dict:
         if self.getPositionType()=="edge":
             return self.map.edges[self.mapLocation]
         else:
             return self.map.nodes[self.mapLocation]
 
-    def setOrientation(self, orientation:str):
+    def setOrientation(self, orientation:str) -> None:
         self.validate()
         try:
             if self.getPositionType()=="edge":
@@ -119,3 +128,52 @@ class PointPosition:
             self.distanceToDestination = self.map.edges[self.mapLocation]['distance']
             self.move(distance)
         return None
+    
+    def getDistance(self, other:PointPosition) -> float:
+        """Return distance in leagues along shortest route between positions"""
+        self.validate()
+        other.validate()
+        if (self.getPositionType() == "node") and (other.getPositionType() =="node"): # easy two-node case
+            if self.mapLocation==other.mapLocation:
+                return 0
+            shortest_path = self.map.getShortestPath(self.mapLocation, other.mapLocation)
+            path_length = self.map.getPathLength(shortest_path)
+            return path_length
+        elif set(self.mapLocation)==set(other.mapLocation): # same-edge case
+            pass
+        elif other.getPositionType()=="node": # self edge, other node
+            distance_choices = []
+            for node_name in self.mapLocation: # iterate over edges
+                node_position = PointPosition(node_name, map=self.map)
+                distance_to_adjacent_node =  node_position.getDistance(other)
+                if node_name==self.orientation:
+                    distance_choices.append(distance_to_adjacent_node+self.distanceToDestination)
+                else:
+                    distance_choices.append(distance_to_adjacent_node+(self.getDescription()['distance'] - self.distanceToDestination))
+            return distance_choices[0] if (distance_choices[0] < distance_choices[1]) else distance_choices[1]
+        else: # both edges
+            distance_choices = []
+            for node_name in self.mapLocation: # iterate over edges
+                node_position = PointPosition(node_name, map=self.map)
+                distance_to_adjacent_node =  other.getDistance(node_position)
+                if node_name==self.orientation:
+                    distance_choices.append(distance_to_adjacent_node+self.distanceToDestination)
+                else:
+                    distance_choices.append(distance_to_adjacent_node+(self.getDescription()['distance'] - self.distanceToDestination))
+            return distance_choices[0] if (distance_choices[0] < distance_choices[1]) else distance_choices[1]
+
+
+class ColumnPosition:
+    """Position of an Army column on a map, spread out or concentrated
+    
+    ***
+    
+    Attributes:
+        vanPosition: PointPosition of vanguard
+        rearPosition: PointPosition of rearguard
+
+    Methods:
+        reverseCourse() -> None
+
+    """
+    pass
