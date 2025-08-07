@@ -255,7 +255,7 @@ class ColumnPosition:
         van_description = str(self.vanPosition)
         rear_description = str(self.rearPosition)
         if self.getCurrentLength()==0:
-            "column arrayed {}".format(van_description)
+            self_description= "column arrayed {}".format(van_description)
         else:
             self_description = "column {} leagues long; van is {}; rear is {})".format(self.getCurrentLength(), van_description, rear_description)
         return self_description
@@ -555,10 +555,11 @@ class ColumnPosition:
         if self.vanPosition.distanceToDestination>0:
             return []
         else:
-            return list(self.vanPosition.map.neighbors(self.vanPosition.orientation))
+            return [n for n in self.vanPosition.map.neighbors(self.vanPosition.orientation) if n!= self.vanPosition.getOrigin()]
 
     def bypassTo(self, bypass_name):
         assert bypass_name in self.getValidBypasses(), "valid bypasses are {}, got '{}'".format(self.getValidBypasses(), bypass_name)
+        self.waypoints = [self.vanPosition.mapLocation] + self.waypoints
         self.vanPosition.mapLocation=(bypass_name, self.vanPosition.orientation)
         self.vanPosition.setOrientation(bypass_name)
         self.vanPosition.distanceToDestination=self.vanPosition.getDescription()['distance']
