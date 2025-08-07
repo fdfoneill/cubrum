@@ -23,6 +23,8 @@ class Army:
         
     Methods:
         getForces() -> dict
+        countInfantry() -> int
+        countCavalry() -> int
         getStrength() -> int
         getTravelTime() -> int
         getLength() -> float
@@ -48,6 +50,20 @@ class Army:
             forces[formation.getDescription()] += formation.warriorCount
             forces["wagons"] += formation.wagonCount
         return dict(forces)
+    
+    def countInfantry(self) -> int:
+        count_infantry = 0
+        for formation in self.formations:
+            if not formation.cavalry:
+                count_infantry += formation.warriorCount 
+        return count_infantry
+
+    def countCavalry(self) -> int:
+        count_cavalry = 0
+        for formation in self.formations:
+            if formation.cavalry:
+                count_cavalry += formation.warriorCount
+        return count_cavalry
     
     def getStrength(self, setting:str="FIELD") -> int:
         """Calculate effective strength of this army in a given setting"""
