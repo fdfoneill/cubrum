@@ -19,7 +19,7 @@ class TestPointPosition(unittest.TestCase):
         self.roads.addNodesFromFile(COPPERCOAST_NODES_PATH)
         self.roads.addEdgesFromFile(COPPERCOAST_ROADS_PATH)
 
-    def testDistanceTwoPoints(self):
+    def testGetDistanceTwoPoints(self):
         position_orbost = cubrum.position.PointPosition("Orbost", map=self.roads)
         position_ulgis = cubrum.position.PointPosition("Ulgis", map=self.roads)
         distance_expected = 4
@@ -27,6 +27,24 @@ class TestPointPosition(unittest.TestCase):
         self.assertEqual(distance_expected, distance_ou)
         distance_uo = position_ulgis.getDistance(position_orbost)
         self.assertEqual(distance_expected, distance_uo)
+
+    def testGetDistancePointEdge(self):
+        position_point = cubrum.position.PointPosition("Bemm", map=self.roads)
+        position_edge = cubrum.position.PointPosition(("The Sapphire Dome", "Lugana"), orientation="Lugana", distanceToDestination=2, map=self.roads)
+        distance_expected = 10
+        distance_pe = position_point.getDistance(position_edge)
+        self.assertEqual(distance_expected, distance_pe)
+        distance_ep = position_edge.getDistance(position_point)
+        self.assertEqual(distance_expected, distance_ep)
+
+    def testGetDistanceBothEdges(self):
+        position_edge1 = cubrum.position.PointPosition(("Oughan Keep", "Joukra"), orientation="Oughan Keep", distanceToDestination=1, map=self.roads)
+        position_edge2 = cubrum.position.PointPosition(("Oughan Keep", "Smara"), orientation="Oughan Keep", distanceToDestination=1, map=self.roads)
+        distance_expected = 2
+        distance_12 = position_edge1.getDistance(position_edge2)
+        self.assertEqual(distance_expected, distance_12)
+        distance_21 = position_edge2.getDistance(position_edge1)
+        self.assertEqual(distance_expected, distance_21)
 
 def main():
     log.info("Creating map")
