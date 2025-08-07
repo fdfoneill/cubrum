@@ -1,0 +1,51 @@
+[
+    ["Port Yarbalk", "Leyke",{"distance":5,"bearing":"southwest"}],
+    ["Keffra", "Smara", {"distance":7, "bearing":"west"}],
+    ["Smara", "Joukra", {"distance":14, "bearing":"southwest"}],
+    ["Joukra", "Craugh", {"distance":11, "bearing":"north"}],
+    ["Joukra", "Touk", {"distance":5, "bearing":"south"}],
+
+    ["Brialgon", "Plovul", {"distance":5, "bearing":"west"}],
+    ["Plovul", "Briarm", {"distance":6, "bearing":"southwest"}],
+    ["Briarm", "Seblen", {"distance":8, "bearing":"south"}],
+    ["Briarm", "Rushkegal", {"distance":18, "bearing":"southeast"}],
+
+    ["Yinnagul", "Confluence of the rivers Estis and Aglun", {"distance":1, "bearing":"south"}],
+    ["Confluence of the rivers Estis and Aglun", "Lastien", {"distance":4, "bearing":"south"}],
+    ["Confluence of the rivers Estis and Aglun", "Festien", {"distance":5, "bearing":"southeast"}],
+
+    ["Hebtesh", "Sawte", {"distance":10, "bearing":"southwest"}],
+    ["Orbost", "Lakavos", {"distance":6, "bearing":"southeast"}],
+    ["Orbost", "Confluence of the rivers Orr and Ull", {"distance":4, "bearing":"southwest"}],
+    ["Confluence of the rivers Orr and Ull", "Ulgis", {"distance":5, "bearing":"north"}],
+    ["Confluence of the rivers Orr and Ull", "Ft. Orr", {"distance":9, "bearing":"southwest"}],
+    ["Ft. Orr", "Nabiac", {"distance":2, "bearing":"northwest"}],
+    ["Ft. Orr", "Ormo", {"distance":5, "bearing":"south"}],
+    ["Ormo", "Soobridge Watch", {"distance":9, "bearing":"southeast"}],
+    ["Ormo", "Meono", {"distance":7, "bearing":"southwest"}],
+    ["Meono", "Jerboon", {"distance":5, "bearing":"southwest"}],
+    ["Jerboon", "Deiri", {"distance":8, "bearing":"southeast"}],
+    ["Deiri", "Lebooni", {"distance":5, "bearing":"southeast"}],
+    ["Jerboon", "Taree", {"distance":12, "bearing":"southwest"}],
+
+    ["Irnost", "Otirr", {"distance":8, "bearing":"southwest"}],
+
+    ["Onjo", "Confluence of the rivers Ozono and Penjozono", {"distance":2, "bearing":"northeast"}],
+    ["Confluence of the rivers Ozono and Penjozono", "Penjey", {"distance":5, "bearing":"north"}],
+    ["Confluence of the rivers Ozono and Penjozono", "Jezaiba", {"distance":4, "bearing":"east"}],
+
+    ["Nkaa", "Karang", {"distance":12, "bearing":"south"}],
+    ["Karang", "Bemm", {"distance":5, "bearing":"south"}],
+    ["Bemm", "Confluence of the rivers Umabey and Joaba", {"distance":11, "bearing":"southwest"}],
+    ["Confluence of the rivers Umabey and Joaba", "Joa", {"distance":5, "bearing":"northwest"}],
+    ["Confluence of the rivers Umabey and Joaba", "Dumba", {"distance":2, "bearing":"southwest"}],
+    ["Dumba", "Merewey", {"distance":11, "bearing":"south"}],
+    ["Bemm", "Talum", {"distance":13, "bearing":"southeast"}],
+    ["Talum", "Lugana", {"distance":14, "bearing":"north"}],
+    ["Lugana", "Kuragang", {"distance":12, "bearing":"northeast"}],
+    ["Kuragang", "Confluence of the rivers Goolang and Irgang", {"distance":2, "bearing":"north"}],
+    ["Confluence of the rivers Goolang and Irgang", "Err", {"distance":12, "bearing":"north"}],
+    ["Confluence of the rivers Goolang and Irgang", "Brick Bridge", {"distance":2, "bearing":"east"}],
+    ["Brick Bridge", "Birgey", {"distance":10, "bearing":"northeast"}],
+    ["Birgey", "Kagar", {"distance":10, "bearing":"north"}]
+]

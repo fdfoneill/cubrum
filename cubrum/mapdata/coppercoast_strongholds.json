@@ -1,0 +1,500 @@
+[ 
+    ["Ilkin", {
+        "strongholdType": "town",
+        "heldBy":"Allakia"
+        }], 
+    ["Ft. Rulk", {
+        "strongholdType": "fortress",
+        "heldBy":"Allakia"
+        }], 
+    ["Port Yarbalk", {
+        "strongholdType": "city",
+        "heldBy":"Allakia"
+        }], 
+    ["Leyke", {
+        "strongholdType": "town",
+        "heldBy":"Allakia"
+        }], 
+    ["Highhold", {
+        "strongholdType": "fortress",
+        "heldBy":"Allakia"
+        }], 
+    ["Craugh", {
+        "strongholdType": "town",
+        "heldBy":"Allakia"
+        }], 
+    ["Joukra", {
+        "strongholdType": "town",
+        "heldBy":"Allakia"
+        }], 
+    ["Oughan Keep", {
+        "strongholdType": "fortress",
+        "heldBy":"Allakia"
+        }], 
+    ["Smara", {
+        "strongholdType": "town",
+        "heldBy":"Allakia"
+        }], 
+    ["Keffra", {
+        "strongholdType": "town",
+        "heldBy":"Allakia"
+        }], 
+    ["Preff Hold", {
+        "strongholdType": "fortress",
+        "heldBy":"Allakia"
+        }], 
+    ["Traffra", {
+        "strongholdType": "city",
+        "heldBy":"Allakia"
+        }], 
+    ["Gorolkan", {
+        "strongholdType": "town",
+        "heldBy":"Allakia"
+        }], 
+    ["Ft. Pelk", {
+        "strongholdType": "fortress",
+        "heldBy":"Allakia"
+        }], 
+    ["Braff Mouth", {
+        "strongholdType": "town",
+        "heldBy":"Allakia"
+        }], 
+    ["The Silverfort", {
+        "strongholdType": "fortress",
+        "heldBy":"Allakia"}], 
+    ["Touk", {
+        "strongholdType": "town",
+        "heldBy":"Allakia"
+        }], 
+
+    ["Myall Keep", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"}], 
+    ["Briarm", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Plovul", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Ft. St. Agnella", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }], 
+    ["Brialgon", {
+        "strongholdType": "city",
+        "heldBy":"Delisgar"
+        }], 
+    ["Ft. St. Lavora", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }], 
+    ["Ft. St. Elga", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }], 
+    ["Bucca", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Tarean", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Tarag", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }], 
+    ["Kirdag", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Dialgen", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Bream Watch", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }], 
+    ["Raffos Keep", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }], 
+    ["Seblen", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Rushkegal", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Three Road Keep", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }], 
+    ["Festien", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Yinnagul", {
+        "strongholdType": "city",
+        "heldBy":"Delisgar"
+        }], 
+    ["Lastien", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["The Hagiomphalos", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }], 
+    ["Ormo", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Castle Nalish", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }], 
+    ["Nabiac", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Ft. St. Ulma", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }], 
+    ["Veliken", {
+        "strongholdType": "town",
+        "heldBy":"Delisgar"
+        }], 
+    ["Nagos", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }],
+    ["Ft. Orr", {
+        "strongholdType": "fortress",
+        "heldBy":"Delisgar"
+        }],
+
+    ["Dapto Watch", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Sawte", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Tesh Keep", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Yumesh", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Yamnos", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Hebtesh", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Bostion's Hold", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Vardac Crossing", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Lakavos", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Jomma Keep", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Otirr", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Irnost", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Osterhold", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }],
+    ["Rothost", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Edgal", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Bralos", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Brogesh", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Ulgis", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Orbost", {
+        "strongholdType": "city",
+        "heldBy":"Dinn"
+    }],
+    ["Argal", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Purann", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Onbur Watch", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Yonn", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Munmor", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Lamm", {
+        "strongholdType": "city",
+        "heldBy":"Dinn"
+        }], 
+    ["Warr's Watch", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Arrawar", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Sultan's Rock", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Nkaa", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Neruga's Gate", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Err", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Nkuwa Crossroads", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Kinnawa", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Tonchell Fortress", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Kinchell", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Buroi Castle", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Ongul", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Ikachell", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Kinjo", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Oniki Crossroads", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Jezaiba", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Peiba Keep", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Penjey", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Sengar", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Jozeg Keep", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Onjo", {
+        "strongholdType": "city",
+        "heldBy":"Dinn"
+        }], 
+    ["Kagar", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Iroj Fortress", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Birgey", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Honey Watch", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }],
+
+    ["Hoonan Pass", {
+        "strongholdType": "fortress",
+        "heldBy":"Boonan"
+        }], 
+    ["Padoo", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Jerboon", {
+        "strongholdType": "city",
+        "heldBy":"Boonan"
+        }], 
+    ["Meono", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }],  
+    ["Kuragang", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Brick Bridge", {
+        "strongholdType": "fortress",
+        "heldBy":"Boonan"
+        }], 
+    ["Lugana", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["The Sapphire Dome", {
+        "strongholdType": "fortress",
+        "heldBy":"Boonan"
+        }], 
+    ["Bemm", {
+        "strongholdType": "city",
+        "heldBy":"Boonan"
+        }], 
+    ["Karang", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Naku Keep", {
+        "strongholdType": "fortress",
+        "heldBy":"Boonan"
+        }], 
+    ["Talum", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Merewey", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Drover's Guard", {
+        "strongholdType": "fortress",
+        "heldBy":"Boonan"
+        }], 
+    ["Dumba", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Joa", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Keep Cuaba", {
+        "strongholdType": "fortress",
+        "heldBy":"Boonan"
+        }], 
+    ["Cua", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Soobridge Watch", {
+        "strongholdType": "fortress",
+        "heldBy":"Boonan"
+        }], 
+    ["Taree", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Sooari Fortress", {
+        "strongholdType": "fortress",
+        "heldBy":"Boonan"
+        }], 
+    ["Deiri", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Fort Droogama", {
+        "strongholdType": "fortress",
+        "heldBy":"Boonan"
+        }], 
+    ["Lebooni", {
+        "strongholdType": "town",
+        "heldBy":"Boonan"
+        }], 
+    ["Sandpass Hold", {
+        "strongholdType": "fortress",
+        "heldBy":"Boonan"
+        }], 
+
+    ["Parl", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Hemz", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }], 
+    ["Castle Razgal", {
+        "strongholdType": "fortress",
+        "heldBy":"Dinn"
+        }], 
+    ["Getch", {
+        "strongholdType": "town",
+        "heldBy":"Dinn"
+        }]
+]

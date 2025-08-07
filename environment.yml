@@ -1,6 +1,8 @@
-name: cubrum
+name: env-cuprum
 channels:
-    - conda-forge
-    - nodefaults
+  - conda-forge
+  - nodefaults
 dependencies:
-    - networkx
+  - networkx
+  - numpy
+  - pandas
