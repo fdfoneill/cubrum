@@ -38,33 +38,33 @@ class Map(Graph):
             self.nodes[node]['name']=node
             # default supply
             if self.nodes[node].get("maxSupply") is None:
-                if self.nodes[node]['strongholdType']=="city":
+                if self.nodes[node].get('strongholdType')=="city":
                     self.nodes[node]['maxSupply'] = np.random.randint(1,7)*100000
                     self.nodes[node]['currentSupply'] = self.nodes[node]['maxSupply']
-                elif self.nodes[node]['strongholdType']=="town":
+                elif self.nodes[node].get('strongholdType')=="town":
                     self.nodes[node]['maxSupply'] = np.random.randint(1,7)*10000
                     self.nodes[node]['currentSupply'] = self.nodes[node]['maxSupply']
-                elif self.nodes[node]['strongholdType']=="fortress":
+                elif self.nodes[node].get('strongholdType')=="fortress":
                     self.nodes[node]['maxSupply'] = np.random.randint(1,7)*1000
                     self.nodes[node]['currentSupply'] = self.nodes[node]['maxSupply']
             # default loot
             if self.nodes[node].get("maxLoot") is None:
-                if self.nodes[node]['strongholdType']=="city":
+                if self.nodes[node].get('strongholdType')=="city":
                     self.nodes[node]['maxLoot'] = np.random.randint(1,7)*100000
                     self.nodes[node]['currentLoot'] = self.nodes[node]['maxLoot']
-                elif self.nodes[node]['strongholdType']=="town":
+                elif self.nodes[node].get('strongholdType')=="town":
                     self.nodes[node]['maxLoot'] = np.random.randint(1,7)*100000
                     self.nodes[node]['currentLoot'] = self.nodes[node]['maxLoot']
-                elif self.nodes[node]['strongholdType']=="fortress":
+                elif self.nodes[node].get('strongholdType')=="fortress":
                     self.nodes[node]['maxLoot'] = (np.random.randint(10,20)*1000) if (np.random.randint(1,11)>9) else 0
                     self.nodes[node]['currentLoot'] = self.nodes[node]['maxLoot']
             # default garrison, update to use Formation objects
             if self.nodes[node].get("garrison") is None:
-                if self.nodes[node]['strongholdType']=="city":
+                if self.nodes[node].get('strongholdType')=="city":
                     self.nodes[node]['garrison'] = [{'name':'{} garrison infantry'.format(node), 'cavalry':False, 'warriorCount':500}]
-                elif self.nodes[node]['strongholdType']=="town":
+                elif self.nodes[node].get('strongholdType')=="town":
                     self.nodes[node]['garrison'] = [{'name':'{} garrison infantry'.format(node), 'cavalry':False, 'warriorCount':250}]
-                elif self.nodes[node]['strongholdType']=="fortress":
+                elif self.nodes[node].get('strongholdType')=="fortress":
                     self.nodes[node]['garrison'] = [{'name':'{} garrison infantry'.format(node),'cavalry':False,'warriorCount':250},{'name':'{} garrison cavalry'.format(node),'cavalry':True,'warriorCount':50}]
 
     def addEdges(self, edge_list) -> None:
