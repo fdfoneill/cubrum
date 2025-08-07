@@ -25,7 +25,7 @@ class DecisionPoint:
     def __repr__(self):
         repstring = "{}(".format(self.trigger)
         for k, v in self.context.items():
-            repstring.append("{}={}, ".format(k, v))
+            repstring += "{}={}, ".format(k, v)
         return repstring[:-2]+")"
     
     def updateContext(self, **kwargs) -> None:
@@ -33,7 +33,11 @@ class DecisionPoint:
 
 
 class ArmyGathered(DecisionPoint):
-    pass 
+    def __init__(self, strongholdName:str, roadFrom:str, heldBy:str, **kwargs):
+        kwargs['strongholdName'] = strongholdName
+        kwargs['heldBy'] = heldBy
+        kwargs['roadFrom'] = roadFrom
+        super().__init__(trigger="ArmyGathered", **kwargs)
 
 
 class ArmySighted(DecisionPoint):
@@ -44,13 +48,21 @@ class BattleResolved(DecisionPoint):
     pass
 
 
+class CrossroadsReached(DecisionPoint):
+    def __init__(self, crossroadsName:str, **kwargs):
+        kwargs['crossroadsName']= crossroadsName
+        super().__init__(trigger="CrossroadsReached", **kwargs)
+
+
 class LetterRecieved(DecisionPoint):
     pass
 
 
-class CrossroadsReached(DecisionPoint):
-    def __init__(self, crossroadsName:str, **kwargs):
-        super().__init__(trigger="CrossroadsReached", crossroadsName=crossroadsName, **kwargs)
+class NodeOccupied(DecisionPoint):
+    def __init__(self, nodeName:str, **kwargs):
+        kwargs['nodeName'] = nodeName
+        kwargs['nodeType'] = kwargs.get("strongholdType", "crossroads")
+        super().__init__(trigger="NodeOccupied", **kwargs)
 
 
 class RumorRecieved(DecisionPoint):
@@ -63,7 +75,9 @@ class StrongholdConquered(DecisionPoint):
 
 class StrongholdReached(DecisionPoint):
     def __init__(self, strongholdName:str, heldBy:str, **kwargs):
-        super().__init__(trigger="StrongholdReached", strongholdName=strongholdName, heldBy=heldBy, **kwargs)
+        kwargs['strongholdName'] = strongholdName
+        kwargs['heldBy'] = heldBy
+        super().__init__(trigger="StrongholdReached", **kwargs)
 
 
 class StrongholdSighted(DecisionPoint):
