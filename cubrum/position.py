@@ -62,8 +62,10 @@ class PointPosition:
     def getPositionType(self) -> str:
         if type(self.mapLocation)==tuple:
             return "edge"
-        else:
+        elif type(self.mapLocation)==str:
             return "node"
+        else:
+            raise InvalidPositionError("type of mapLocation must be tuple or str, got {}".format(type(self.mapLocation)))
         
     def getDescription(self) -> dict:
         if self.getPositionType()=="edge":
@@ -143,20 +145,25 @@ class PointPosition:
             return path_length
         elif set(self.mapLocation)==set(other.mapLocation): # same-edge case
             pass
-        elif other.getPositionType()=="node": # self edge, other node
+        elif (self.getPositionType()=="edge") and (other.getPositionType()=="node"): # self edge, other node
             distance_choices = []
             for node_name in self.mapLocation: # iterate over edges
                 node_position = PointPosition(node_name, map=self.map)
+                node_position.validate()
                 distance_to_adjacent_node =  node_position.getDistance(other)
                 if node_name==self.orientation:
                     distance_choices.append(distance_to_adjacent_node+self.distanceToDestination)
                 else:
                     distance_choices.append(distance_to_adjacent_node+(self.getDescription()['distance'] - self.distanceToDestination))
             return distance_choices[0] if (distance_choices[0] < distance_choices[1]) else distance_choices[1]
+        elif (self.getPositionType()=="node") and (other.getPositionType()=="edge"): # self node, other edge
+            # reverse case already handled, so just switch self and other
+            return other.getDistance(self)
         else: # both edges
             distance_choices = []
             for node_name in self.mapLocation: # iterate over edges
                 node_position = PointPosition(node_name, map=self.map)
+                node_position.validate()
                 distance_to_adjacent_node =  other.getDistance(node_position)
                 if node_name==self.orientation:
                     distance_choices.append(distance_to_adjacent_node+self.distanceToDestination)
