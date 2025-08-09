@@ -549,8 +549,8 @@ class ColumnPosition:
                 else:
                     return
         else:
-            raise InvalidActionError("cannot move while holding position, define an orientation")
-
+            # raise InvalidActionError("cannot move while holding position, define an orientation")
+            return NodeOccupied(self.vanPosition.mapLocation)
     def getValidBypasses(self):
         if self.vanPosition.distanceToDestination>0:
             return []
