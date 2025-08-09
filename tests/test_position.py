@@ -14,6 +14,18 @@ from cubrum.exceptions import InvalidPositionError
 COPPERCOAST_NODES_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cubrum", "mapdata", "coppercoast_strongholds.json")
 COPPERCOAST_ROADS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "cubrum", "mapdata", "coppercoast_roads.json")
 
+def initializeColumn(stronghold_name:str, column_length:float=0.3) -> cubrum.position.ColumnPosition:
+    assert os.path.exists(COPPERCOAST_NODES_PATH)
+    assert os.path.exists(COPPERCOAST_ROADS_PATH)
+    coppercoast = cubrum.map.Map()
+    coppercoast.addNodesFromFile(COPPERCOAST_NODES_PATH)
+    coppercoast.addEdgesFromFile(COPPERCOAST_ROADS_PATH)
+    assert stronghold_name in coppercoast.nodes
+    van_position = cubrum.position.PointPosition(stronghold_name, map=coppercoast)
+    rear_position = cubrum.position.PointPosition(stronghold_name, map=coppercoast)
+    column_position = cubrum.position.ColumnPosition(vanPosition=van_position, rearPosition=rear_position, columnLength=column_length)
+    return column_position
+
 
 class TestPointPosition(unittest.TestCase):
     def setUp(self):
