@@ -168,7 +168,7 @@ class PointPosition:
                     return StrongholdReached(strongholdName=reached_destination['name'], remaining_movement=remaining_movement, **reached_destination)
                 else:
                     return CrossroadsReached(crossroadsName = reached_destination['name'], remaining_movement=remaining_movement, **reached_destination)
-            self.distanceToDestination -= distance
+            self.distanceToDestination = round(self.distanceToDestination - distance, 2)
         else:
             # node behavior
             if (toward is not None) and (toward != self.orientation):
@@ -181,7 +181,7 @@ class PointPosition:
                 raise InvalidActionError("updating position from a node but orientation is not set")
             self.mapLocation = (self.mapLocation, self.orientation)
             self.distanceToDestination = self.map.edges[self.mapLocation]['distance']
-            self.move(distance)
+            return self.move(distance)
         return None
     
     def getDistance(self, other:"PointPosition") -> float:
@@ -310,7 +310,7 @@ class ColumnPosition:
 
     def getCurrentLength(self) -> float:
         """Return current extent of column"""
-        return self.vanPosition.getDistance(self.rearPosition)
+        return round(self.vanPosition.getDistance(self.rearPosition), 2)
 
     def getValidOrientations(self) -> list:
         valid_orientations = [waypoint for waypoint in self.waypoints]
@@ -357,6 +357,19 @@ class ColumnPosition:
                 tempRear.setOrientation(tempVan.orientation)
         self.vanPosition = tempVan
         self.rearPosition = tempRear
+        
+    def getOrientation(self, gather_at_gates:bool=False) -> str:
+        self.validate()
+        if self.getMotion(gather_at_gates) in ["marching", "gathering"]:
+            return self.vanPosition.orientation
+        elif self.getMotion(gather_at_gates) in ["holding", "entering"]:
+            return self.vanPosition.mapLocation
+        elif self.getMotion(gather_at_gates)=="regrouping":
+            if len(self.waypoints)<1:
+                raise InvalidPositionError("regrouping without waypoints")
+            return self.waypoints[0]
+        else:
+            raise InvalidPositionError("invalid value '{}' returned from getMotion()".format(self.getMotion()))
 
     def setOrientation(self, new_orientation) -> None:
         assert new_orientation in self.getValidOrientations(), "valid orientations are {}, got '{}'".format(self.getValidOrientations(), new_orientation)
@@ -396,7 +409,7 @@ class ColumnPosition:
             raise InvalidActionError("Cannot set orientation of column with vanPosition '{}', rearPosition '{}', and waypoints '{}' to '{}'".format(self.vanPosition.mapLocation, self.rearPosition.mapLocation, self.waypoints, new_orientation))
         self.validate()
 
-    def reform(self):
+    def reform(self) -> None:
         if self.vanPosition.getPositionType()=="node" and self.rearPosition.getPositionType()=="node":
             if self.vanPosition.mapLocation!= self.rearPosition.mapLocation:
                 self.rearPosition.move(0.015) # move out about 100 yards so we don't have van and rear in different nodes
@@ -550,16 +563,17 @@ class ColumnPosition:
                     return
         else:
             # raise InvalidActionError("cannot move while holding position, define an orientation")
-            return NodeOccupied(self.vanPosition.mapLocation)
-    def getValidBypasses(self):
-        if self.vanPosition.distanceToDestination>0:
+            return NodeOccupied(nodeName=self.vanPosition.mapLocation, **self.vanPosition.getDescription())
+   
+    def getValidBypasses(self) -> list:
+        if (self.vanPosition.distanceToDestination is None) or (self.vanPosition.distanceToDestination>0):
             return []
         else:
             return [n for n in self.vanPosition.map.neighbors(self.vanPosition.orientation) if n!= self.vanPosition.getOrigin()]
 
-    def bypassTo(self, bypass_name):
+    def bypassTo(self, bypass_name) -> None:
         assert bypass_name in self.getValidBypasses(), "valid bypasses are {}, got '{}'".format(self.getValidBypasses(), bypass_name)
-        self.waypoints = [self.vanPosition.mapLocation] + self.waypoints
+        self.waypoints = [self.vanPosition.orientation] + self.waypoints
         self.vanPosition.mapLocation=(bypass_name, self.vanPosition.orientation)
         self.vanPosition.setOrientation(bypass_name)
         self.vanPosition.distanceToDestination=self.vanPosition.getDescription()['distance']

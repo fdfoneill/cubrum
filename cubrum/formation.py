@@ -47,6 +47,18 @@ class Formation:
                 return self.warriorCount
         else:
             return self.warriorCount
+        
+    def getTravelDistance(self, hours:int=1, forced:bool=False) -> float:
+        """Returns the distance the formation travels in a fixed number of hours"""
+        if forced:
+            if self.cavalry:
+                leagues_per_hour = 2
+            else:
+                leagues_per_hour = 1
+        else:
+            leagues_per_hour = 0.5
+        distance = hours * leagues_per_hour
+        return round(distance, 2)
     
     def getTravelTime(self, edge, forced:bool=False) -> int:
         """Returns the time in hours for this formation to travel a graph edge"""
@@ -71,7 +83,7 @@ class Formation:
             warrior_length_miles = self.warriorCount / 5000
         wagon_length_miles = self.wagonCount / 50
         formation_length_miles = warrior_length_miles + wagon_length_miles
-        return formation_length_miles / 3 # league conversion
+        return round(formation_length_miles / 3, 2) # league conversion
     
     def getSupplyCapacity(self) -> int:
         """Calculate how much supply the formation can transport"""

@@ -4,8 +4,11 @@ log = logging.getLogger(__name__)
 
 from collections import Counter
 
-from .position import Position
+from .map import Map
 from .commander import Commander
+from .position import PointPosition, ColumnPosition
+from .decisionpoint import DecisionPoint
+from .exceptions import InvalidActionError
 
 class Army:
     """Defines a force of formations led by a commander
@@ -19,7 +22,7 @@ class Army:
         morale:int
         supply:int
         noncombattantPercent:int
-        position:cubrum.position.Position
+        position:cubrum.position.ColumnPosition
         
     Methods:
         getForces() -> dict
@@ -34,14 +37,25 @@ class Army:
         applyCasualties() -> None
         
     """
-    def __init__(self, name:str, formations:list, commander:Commander, supply:int, position:Position, morale:int=7, noncombattantPercent:int=25):
+    def __init__(self, name:str, formations:list, commander:Commander, supply:int, startingStronghold:str, map:Map, morale:int=7, noncombattantPercent:int=25):
         self.name = str(name)
+        self.map = map
         self.commander = commander
         self.formations = list(formations)
         self.supply=int(supply)
-        self.position=position
         self.morale=int(morale)
         self.noncombattantPercent = int(noncombattantPercent)
+        assert startingStronghold in self.map.nodes, "stronghold '{}' not found".format(startingStronghold)
+        van_position = PointPosition(startingStronghold, map)
+        rear_position = PointPosition(startingStronghold, map)
+        self.position = ColumnPosition(vanPosition=van_position, rearPosition=rear_position, columnLength=self.getLength())
+        
+    def __repr__(self) -> str:
+        repr_string = "Army("
+        for unit_type, unit_count in self.getForces().items():
+            repr_string += "{} {}, ".format(unit_count, unit_type)
+        repr_string = repr_string[:-2]+")"
+        return repr_string
         
     def getForces(self) -> dict:
         """Return dictionary counting each type of troop within army"""
@@ -73,6 +87,17 @@ class Army:
             strength_total += formation.getStrength(setting=setting)
         return strength_total
     
+    def getTravelDistance(self, hours:int, forced:bool=False) -> float:
+        """Returns the travel diatance for the slowest formation in the army over a number of hours"""
+        leagues = -1
+        for formation in self.formations:
+            formation_leagues = formation.getTravelDistance(hours, forced)
+            if leagues==-1:
+                leagues=formation_leagues
+            elif formation_leagues < leagues:
+                leagues = formation_leagues
+        return round(leagues, 2)
+    
     def getTravelTime(self, edge) -> int:
         """Returns the travel time for the slowest formation in the army along this edge"""
         hours = 0
@@ -89,7 +114,7 @@ class Army:
             length_warriors += formation.getLength()
         length_noncombattants = (self.getNoncombattantCount()/5000)/3
         army_length = length_warriors + length_noncombattants
-        return army_length
+        return round(army_length, 2)
     
     def getSupplyMax(self) -> int:
         """Calculate maximum quantity of supply the army can carry"""
@@ -109,6 +134,55 @@ class Army:
             count_warriors += formation.warriorCount
         count_noncombattants = int(count_warriors * (self.noncombattantPercent/100))
         return count_noncombattants
+    
+    def getValidDestinations(self) -> list[str]:
+        return self.position.getValidOrientations()
+    
+    def getDestination(self) -> str:
+        return self.position.getOrientation()
+    
+    def setDestination(self, new_destination) -> None:
+        try:
+            assert new_destination in self.getValidDestinations()
+            self.position.setOrientation(new_destination)
+        except Exception as e:
+            raise InvalidActionError(e)
+    
+    def march(self, hours:int=None, distance:float=None, forced:bool=False, destination:str=None, gather_at_gates:bool=False) -> DecisionPoint:
+        """March army for a set number of hours or leagues
+        
+        ***
+        
+        Parameters:
+            hours: default None. How long to march. Exactly one of hours or 
+                leagues must be set
+            distance: default None. How far to march, in leagues. Exactly one 
+                of hours or leagues must be set
+            forced: default False. Whether this is a forced march
+            destination: default None. If provided, the army's destination is 
+                updated to the value of destination
+            gather_at_gates: default False. Whether to gather forces outside 
+                a stronghold rather than entering it.
+        """
+        assert (hours is None) ^ (distance is None), "exactly one of hours or leagues must be set"
+        try:
+            if destination is not None:
+                if destination in self.getValidDestinations():
+                    self.setDestination(destination)
+                elif destination in self.getValidBypasses():
+                    self.bypassTo(destination)
+                else:
+                    raise InvalidActionError("'{}' is not a valid destination for this march".format(destination))
+            leagues = distance or self.getTravelDistance(hours=hours, forced=forced)
+            return self.position.move(leagues, gather_at_gates=gather_at_gates)
+        except AssertionError as e:
+            raise InvalidActionError(e)
+            
+    def getValidBypasses(self) -> list:
+        return self.position.getValidBypasses()
+    
+    def bypassTo(self, bypass_name) -> None:
+        self.position.bypassTo(bypass_name)
     
     def applyCasualties(self, count:int=None, percent:int=None) -> None:
         raise NotImplementedError("cubrum.army.Army.applyCasualties not implemented")
