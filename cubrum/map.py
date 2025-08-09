@@ -7,6 +7,8 @@ import numpy as np
 import networkx as nx
 from networkx.classes.graph import Graph
 
+from .formation import Formation
+
 
 class Map(Graph):
     """A network of locations and paths between them
@@ -61,11 +63,11 @@ class Map(Graph):
             # default garrison, update to use Formation objects
             if self.nodes[node].get("garrison") is None:
                 if self.nodes[node].get('strongholdType')=="city":
-                    self.nodes[node]['garrison'] = [{'name':'{} garrison infantry'.format(node), 'cavalry':False, 'warriorCount':500}]
+                    self.nodes[node]['garrison'] = [Formation(**{'name':'{} garrison infantry'.format(node), 'cavalry':False, 'warriorCount':500, 'wagonCount':0})]
                 elif self.nodes[node].get('strongholdType')=="town":
-                    self.nodes[node]['garrison'] = [{'name':'{} garrison infantry'.format(node), 'cavalry':False, 'warriorCount':250}]
+                    self.nodes[node]['garrison'] = [Formation(**{'name':'{} garrison infantry'.format(node), 'cavalry':False, 'warriorCount':250, 'wagonCount':0})]
                 elif self.nodes[node].get('strongholdType')=="fortress":
-                    self.nodes[node]['garrison'] = [{'name':'{} garrison infantry'.format(node),'cavalry':False,'warriorCount':250},{'name':'{} garrison cavalry'.format(node),'cavalry':True,'warriorCount':50}]
+                    self.nodes[node]['garrison'] = [Formation(**{'name':'{} garrison infantry'.format(node),'cavalry':False,'warriorCount':250, 'wagonCount':0}),Formation(**{'name':'{} garrison cavalry'.format(node),'cavalry':True,'warriorCount':50, 'wagonCount':0})]
 
     def addEdges(self, edge_list) -> None:
         """Add edges to underlying graph object
@@ -81,6 +83,9 @@ class Map(Graph):
         for e in edge_json:
             e[2]['start'] = e[0]
         self.add_edges_from(edge_json)
+        for node in self.nodes:
+            # set name
+            self.nodes[node]['name']=node
 
     def addNodesFromFile(self, json_file_path) -> None:
         with open(json_file_path, 'r') as rf:
