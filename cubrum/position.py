@@ -578,3 +578,64 @@ class ColumnPosition:
         self.vanPosition.setOrientation(bypass_name)
         self.vanPosition.distanceToDestination=self.vanPosition.getDescription()['distance']
         self.reform()
+        
+    def containsPoint(self, other:PointPosition) -> bool:
+        """Whether the column contains a given PointPosition"""
+        if other.getPositionType()=="node":
+            if other.mapLocation in [self.vanPosition.mapLocation, self.rearPosition.mapLocation] + self.waypoints:
+                return True 
+        else:
+            if (self.vanPosition.getPositionType()=="edge") and (set(other.mapLocation)==set(self.vanPosition.mapLocation)): # on vanPosition's edge
+                if (len(self.waypoints)==0 or (self.vanPosition.orientation!=self.waypoints[0])): # not shrinking
+                    # check if it falls in the same part of the edge
+                    if other.orientation==self.vanPosition.orientation:
+                        if other.distanceToDestination >= self.vanPosition.distanceToDestination:
+                            return True
+                    else: # facing opposite directons
+                        if (other.getDescription()['distance']-other.distanceToDestination) >= self.vanPosition.distanceToDestination:
+                            return True
+                else: # shrinking
+                    # check if it falls in the same part of the edge
+                    if other.orientation==self.vanPosition.orientation:
+                        if other.distanceToDestination <= self.vanPosition.distanceToDestination:
+                            return True
+                    else: # facing opposite directons
+                        if (other.getDescription()['distance']-other.distanceToDestination) <= self.vanPosition.distanceToDestination:
+                            return True
+            if (self.rearPosition.getPositionType()=="edge") and (set(other.mapLocation)==set(self.rearPosition.mapLocation)): # on rearPosition's edge
+                # check if it falls in the same part of the edge
+                if other.orientation==self.rearPosition.orientation:
+                    if other.distanceToDestination <= self.rearPosition.distanceToDestination:
+                        return True
+                else: # facing opposite directions
+                    if (other.getDescription()['distance']-other.distanceToDestination) <= self.rearPosition.distanceToDestination:
+                        return True
+            if len(self.waypoints)>1:
+                for i in range(1, len(self.waypoints)):
+                    if set(other.mapLocation)==set((self.waypoints[i-1], self.waypoints[i])):
+                        return True
+        return False
+        
+    def intersectsColumn(self, other:"ColumnPosition") -> bool:
+        """Whether the column overlaps at all with another column"""
+        if (self.containsPoint(other.vanPosition)) or (self.containsPoint(other.rearPosition)):
+            return True
+        for waypoint in self.waypoints:
+            if (waypoint in other.waypoints) or (waypoint==other.vanPosition.mapLocation) or (waypoint==other.rearPosition.mapLocation):
+                return True
+        for waypoint in other.waypoints:
+            if (waypoint in self.waypoints) or (waypoint==self.vanPosition.mapLocation) or (waypoint==self.rearPosition.mapLocation):
+                return True
+        return False
+    
+    def getDistance(self, other:"ColumnPosition") -> float:
+        if self.intersectsColumn(other):
+            return -1
+        min_distance = None
+        for self_position in [self.vanPosition, self.rearPosition] + [PointPosition(wp, map=self.map) for wp in self.waypoints]:
+            for other_position in [other.vanPosition, other.rearPosition] + [PointPosition(wp, map=other.map) for wp in other.waypoints]:
+                pair_distance = self_position.getDistance(other_position)    
+                if (min_distance is None) or (pair_distance < min_distance):
+                    min_distance = pair_distance
+        return round(min_distance, 2)
+    
