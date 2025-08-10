@@ -29,11 +29,16 @@ class Army:
         countInfantry() -> int
         countCavalry() -> int
         getStrength() -> int
-        getTravelTime() -> int
+        getTravelDistance() -> float
         getLength() -> float
         getSupplyMax() -> int
         getSupplyConsumption() -> int
         getNoncombattantCount() -> int
+        getValidDestinations() -> list[str]
+        getDestination() -> str
+        setDestination() -> None
+        march() -> DecisionPoint
+        def getValidBypasses() -> list[str]
         applyCasualties() -> None
         
     """
@@ -96,16 +101,14 @@ class Army:
                 leagues=formation_leagues
             elif formation_leagues < leagues:
                 leagues = formation_leagues
+        if self.getLength()>2: # armies longer than 2 leagues move slower
+            if forced:
+                slow_speed = 12/18
+            else:
+                slow_speed = 6/18
+            if (slow_speed*hours)<leagues:
+                leagues = (slow_speed*hours)
         return round(leagues, 2)
-    
-    def getTravelTime(self, edge) -> int:
-        """Returns the travel time for the slowest formation in the army along this edge"""
-        hours = 0
-        for formation in self.formations:
-            formation_hours = formation.getTravelTime(edge)
-            if formation_hours > hours:
-                hours = formation_hours 
-        return hours
     
     def getLength(self) -> float:
         """Calculate length in leagues of the army on the march"""
@@ -185,4 +188,8 @@ class Army:
         self.position.bypassTo(bypass_name)
     
     def applyCasualties(self, count:int=None, percent:int=None) -> None:
+        try:
+            assert (count is None) ^ (percent is None), "exactly one of count or percent must be set"
+        except AssertionError as e:
+            raise ValueError(e)
         raise NotImplementedError("cubrum.army.Army.applyCasualties not implemented")
