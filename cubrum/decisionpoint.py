@@ -52,9 +52,17 @@ class CrossroadsReached(DecisionPoint):
     def __init__(self, crossroadsName:str, **kwargs):
         kwargs['crossroadsName']= crossroadsName
         super().__init__(trigger="CrossroadsReached", **kwargs)
+        
+
+class DayBreaks(DecisionPoint):
+    pass
 
 
 class LetterRecieved(DecisionPoint):
+    pass
+
+
+class NightFalls(DecisionPoint):
     pass
 
 
