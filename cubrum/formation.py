@@ -66,11 +66,11 @@ class Formation:
             return -1 # wagons cannot travel overland
         if forced:
             if self.cavalry:
-                leagues_per_hour = 2
+                leagues_per_hour = (36/3)/16
             else:
-                leagues_per_hour = 1
+                leagues_per_hour = (18/3)/16
         else:
-            leagues_per_hour = 0.5
+            leagues_per_hour = (12/3)/16
         distance = edge.distance
         hours = distance / leagues_per_hour
         return int(hours)
