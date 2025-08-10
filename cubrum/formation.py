@@ -107,14 +107,14 @@ class Formation:
     def applyCasualties(self, count:int=None, percent:int=None) -> None:
         try:
             assert (count is None) ^ (percent is None), "exactly one of count or percent must be set"
-            count = count or int(percent * self.warriorCount)
+            count = count or int((percent/100) * self.warriorCount)
             percent = percent or (count/self.warriorCount)
             if count >= self.warriorCount:
                 self.warriorCount = 0
                 self.wagonCount = 0
                 return 0
             self.warriorCount -= count 
-            self.wagonCount -= int(self.wagonCount*percent)
+            self.wagonCount -= int(self.wagonCount*(percent/100))
             return self.warriorCount
         except AssertionError as e:
             raise ValueError(e)

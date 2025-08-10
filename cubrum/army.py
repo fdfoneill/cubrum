@@ -2,6 +2,7 @@ import logging, os
 logging.basicConfig(level=os.environ.get("LOGLEVEL","INFO"))
 log = logging.getLogger(__name__)
 
+import numpy as np
 from collections import Counter
 
 from .map import Map
@@ -190,6 +191,15 @@ class Army:
     def applyCasualties(self, count:int=None, percent:int=None) -> None:
         try:
             assert (count is None) ^ (percent is None), "exactly one of count or percent must be set"
+            if count is None:
+                count = int((self.countInfantry()+self.countCavalry())*(percent/100))
+            weights = []
+            for formation in self.formations:
+                # TODO: more sophisticated weighting
+                weights.append(formation.warriorCount)
+            indices = np.random.choice(len(weights), size=count, p = np.array(weights)/sum(weights))
+            counts_by_formation = np.bincount(indices, minlength=len(weights))
+            for i in range(len(self.formations)):
+                self.formations[i].applyCasualties(count=counts_by_formation[i])
         except AssertionError as e:
             raise ValueError(e)
-        raise NotImplementedError("cubrum.army.Army.applyCasualties not implemented")
