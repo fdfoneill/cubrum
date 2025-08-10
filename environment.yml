@@ -1,4 +1,4 @@
-name: env-cuprum
+name: env-cubrum
 channels:
   - conda-forge
   - nodefaults
@@ -6,3 +6,4 @@ dependencies:
   - networkx
   - numpy
   - pandas
+  - pytest
