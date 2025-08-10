@@ -318,6 +318,34 @@ class TestColumnPosition(unittest.TestCase):
         column_position = cubrum.position.ColumnPosition(vanPosition=van_position, rearPosition=rear_position,waypoints=["Nkaa","Sultan's Rock"], columnLength=10)
         outside_position = cubrum.position.PointPosition(("Sultan's Rock","Nkaa"),orientation="Nkaa",distanceToDestination=0.3, map=self.roads)
         self.assertTrue(column_position.containsPoint(outside_position))
+        
+    def testContainsPointWithinEdgeInside(self):
+        van_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Ulgis", distanceToDestination=1, map=self.roads)
+        rear_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Ulgis", distanceToDestination=3, map=self.roads)
+        column_position = cubrum.position.ColumnPosition(vanPosition=van_position, rearPosition=rear_position, waypoints=["Ulgis"], columnLength=10)
+        outside_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Ulgis", distanceToDestination=2, map=self.roads)
+        self.assertTrue(column_position.containsPoint(outside_position))
+        
+    def testContainsPointWithinEdgeOutside(self):
+        van_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Ulgis", distanceToDestination=1, map=self.roads)
+        rear_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Ulgis", distanceToDestination=3, map=self.roads)
+        column_position = cubrum.position.ColumnPosition(vanPosition=van_position, rearPosition=rear_position, waypoints=["Ulgis"], columnLength=10)
+        outside_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Ulgis", distanceToDestination=0.5, map=self.roads)
+        self.assertFalse(column_position.containsPoint(outside_position))
+        
+    def testContainsPointWithinEdgeInsideReverse(self):
+        van_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Ulgis", distanceToDestination=1, map=self.roads)
+        rear_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Ulgis", distanceToDestination=3, map=self.roads)
+        column_position = cubrum.position.ColumnPosition(vanPosition=van_position, rearPosition=rear_position, waypoints=["Ulgis"], columnLength=10)
+        outside_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Orbost", distanceToDestination=2, map=self.roads)
+        self.assertTrue(column_position.containsPoint(outside_position))
+        
+    def testContainsPointWithinEdgeOutsideReverse(self):
+        van_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Ulgis", distanceToDestination=1, map=self.roads)
+        rear_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Ulgis", distanceToDestination=3, map=self.roads)
+        column_position = cubrum.position.ColumnPosition(vanPosition=van_position, rearPosition=rear_position, waypoints=["Ulgis"], columnLength=10)
+        outside_position = cubrum.position.PointPosition(("Ulgis", "Orbost"), orientation="Orbost", distanceToDestination=3.5, map=self.roads)
+        self.assertFalse(column_position.containsPoint(outside_position))
     
         
 

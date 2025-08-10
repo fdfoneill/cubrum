@@ -585,7 +585,14 @@ class ColumnPosition:
             if other.mapLocation in [self.vanPosition.mapLocation, self.rearPosition.mapLocation] + self.waypoints:
                 return True 
         else:
-            if (self.vanPosition.getPositionType()=="edge") and (set(other.mapLocation)==set(self.vanPosition.mapLocation)): # on vanPosition's edge
+            if (self.vanPosition.getPositionType()=="edge") and (set(other.mapLocation)==set(self.vanPosition.mapLocation))and (set(other.mapLocation)==set(self.rearPosition.mapLocation)):
+                if other.orientation==self.vanPosition.orientation:
+                    if (other.distanceToDestination >= self.vanPosition.distanceToDestination) and (other.distanceToDestination <= self.rearPosition.distanceToDestination):
+                        return True
+                else:
+                    if (other.getDescription()['distance']-other.distanceToDestination >= self.vanPosition.distanceToDestination) and (other.getDescription()['distance']-other.distanceToDestination <= self.rearPosition.distanceToDestination):
+                        return True
+            elif (self.vanPosition.getPositionType()=="edge") and (set(other.mapLocation)==set(self.vanPosition.mapLocation)): # on vanPosition's edge
                 if (len(self.waypoints)==0 or (self.vanPosition.orientation!=self.waypoints[0])): # not shrinking
                     # check if it falls in the same part of the edge
                     if other.orientation==self.vanPosition.orientation:
@@ -602,7 +609,7 @@ class ColumnPosition:
                     else: # facing opposite directons
                         if (other.getDescription()['distance']-other.distanceToDestination) <= self.vanPosition.distanceToDestination:
                             return True
-            if (self.rearPosition.getPositionType()=="edge") and (set(other.mapLocation)==set(self.rearPosition.mapLocation)): # on rearPosition's edge
+            elif (self.rearPosition.getPositionType()=="edge") and (set(other.mapLocation)==set(self.rearPosition.mapLocation)): # on rearPosition's edge
                 # check if it falls in the same part of the edge
                 if other.orientation==self.rearPosition.orientation:
                     if other.distanceToDestination <= self.rearPosition.distanceToDestination:
