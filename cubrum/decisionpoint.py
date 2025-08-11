@@ -49,7 +49,9 @@ class ArmyEngaged(DecisionPoint):
 
 
 class BattleResolved(DecisionPoint):
-    pass
+    def __init__(self, belligerents:dict, **kwargs):
+        kwargs['belligerents'] = belligerents
+        super().__init__(trigger="BattleResolved", **kwargs)
 
 
 class CrossroadsReached(DecisionPoint):

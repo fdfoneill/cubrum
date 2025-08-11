@@ -29,6 +29,17 @@ class Map(Graph):
             self.nodes[node]['name']=node
             self.nodes[node]['taxed']=self.nodes[node].get("taxed", [])
             self.nodes[node]['levied']=self.nodes[node].get("levied", [])
+            # default defenses
+            if self.nodes[node].get("defenses") is None:
+                if self.nodes[node].get('strongholdType')=="city":
+                    self.nodes[node]['defenses'] = 4
+                elif self.nodes[node].get('strongholdType')=="town":
+                    self.nodes[node]['defenses'] = 3
+                elif self.nodes[node].get('strongholdType')=="fortress":
+                    self.nodes[node]['defenses'] = 5
+            # gates closed by default
+            if self.nodes[node].get("gatesOpen") is None:
+                self.nodes[node]['gatesOpen'] = False
             # default supply
             if self.nodes[node].get("maxSupply") is None:
                 if self.nodes[node].get('strongholdType')=="city":
