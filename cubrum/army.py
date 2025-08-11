@@ -7,6 +7,7 @@ from collections import Counter
 
 from .map import Map
 from .commander import Commander
+from .formation import Formation
 from .position import PointPosition, ColumnPosition
 from .decisionpoint import DecisionPoint
 from .exceptions import InvalidActionError
@@ -24,6 +25,7 @@ class Army:
         supply:int
         noncombattantPercent:int
         position:cubrum.position.ColumnPosition
+        isGarrison:bool
         
     Methods:
         getForces() -> dict
@@ -43,7 +45,23 @@ class Army:
         applyCasualties() -> None
         
     """
-    def __init__(self, name:str, formations:list, commander:Commander, supply:int, startingStronghold:str, map:Map, morale:int=7, noncombattantPercent:int=25):
+    @staticmethod 
+    def fromGarrison(garrison:dict, map:Map, stronghold:str) -> "Army":
+        """Parse stronghold garrison to Army object"""
+        name = garrison['name']
+        infantryCount = garrison.get("infantryCount", 0)
+        cavalryCount = garrison.get("cavalryCount", 0) 
+        garrisonCommander = Commander(name=name, age=30, title="commander of the", culture=None)
+        garrisonFormations = []
+        if infantryCount > 0:
+            garrisonFormations.append(Formation("{} infantry".format(name),infantryCount,wagonCount=0,cavalry=False,heavy=False))
+        if cavalryCount > 0:
+            garrisonFormations.append(Formation("{} cavalry".format(name),cavalryCount,wagonCount=0,cavalry=True,heavy=False))
+        garrisonArmy = Army(name, garrisonFormations, garrisonCommander, supply=0, startingStronghold=stronghold, map=map, noncombattantPercent=0, isGarrison=True)
+        return garrisonArmy
+
+
+    def __init__(self, name:str, formations:list, commander:Commander, supply:int, startingStronghold:str, map:Map, morale:int=7, noncombattantPercent:int=25, isGarrison=False):
         self.name = str(name)
         self.map = map
         self.commander = commander
@@ -55,6 +73,7 @@ class Army:
         van_position = PointPosition(startingStronghold, map)
         rear_position = PointPosition(startingStronghold, map)
         self.position = ColumnPosition(vanPosition=van_position, rearPosition=rear_position, columnLength=self.getLength())
+        self.isGarrison=isGarrison
         
     def __repr__(self) -> str:
         repr_string = "Army("
