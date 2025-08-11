@@ -16,8 +16,9 @@ def initializeArmy(starting_stronghold:str=None, formations:list=None) -> army.A
     starting_stronghold=starting_stronghold or "Yinnagul"
     cmdr = commander.Commander("Ismos",28,"Sir")
     assert starting_stronghold in coppercoast.nodes
-    cavalry = formation.Formation(name="1st Yinnagul Light Cavalry", warriorCount=200, wagonCount=0, cavalry=True)
-    recon_force = army.Army(name="Yinnagul Reconnaisance Force", formations=(formations or [cavalry]), commander=cmdr, supply=cavalry.getSupplyCapacity(), startingStronghold=starting_stronghold,map=coppercoast)
+    cavalry1 = formation.Formation(name="1st Yinnagul Light Cavalry", warriorCount=200, wagonCount=0, cavalry=True)
+    cavalry2 = formation.Formation(name="2nd Yinnagul Light Cavalry", warriorCount=100, wagonCount=0, cavalry=True)
+    recon_force = army.Army(name="Yinnagul Reconnaisance Force", allegience="Delisgar", formations=(formations or [cavalry1, cavalry2]), commander=cmdr, supply=cavalry1.getSupplyCapacity(), startingStronghold=starting_stronghold,map=coppercoast)
     return recon_force
     
     
