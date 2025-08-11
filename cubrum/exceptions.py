@@ -6,5 +6,8 @@ log = logging.getLogger(__name__)
 class InvalidActionError(Exception):
     pass
 
+class InvalidBattleError(Exception):
+    pass
+
 class InvalidPositionError(Exception):
     pass
