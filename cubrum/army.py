@@ -197,16 +197,16 @@ class Army:
         
         Parameters:
             hours: default None. How long to march. Exactly one of hours or 
-                leagues must be set
+                distance must be set
             distance: default None. How far to march, in leagues. Exactly one 
-                of hours or leagues must be set
+                of hours or distance must be set
             forced: default False. Whether this is a forced march
             destination: default None. If provided, the army's destination is 
                 updated to the value of destination
             gather_at_gates: default False. Whether to gather forces outside 
                 a stronghold rather than entering it.
         """
-        assert (hours is None) ^ (distance is None), "exactly one of hours or leagues must be set"
+        assert (hours is None) ^ (distance is None), "exactly one of hours or distance must be set"
         try:
             if destination is not None:
                 if destination in self.getValidDestinations():
@@ -219,6 +219,12 @@ class Army:
             return self.position.move(leagues, gather_at_gates=gather_at_gates)
         except AssertionError as e:
             raise InvalidActionError(e)
+        
+    def retreat(self, hours:float=None, distance:float=None, awayFrom:"Army"=None) -> None:
+        assert (hours is None) ^ (distance is None), "exactly one of hours or distance must be set"
+        
+        #TODO: Implement
+        raise NotImplementedError("retreat() method not implemented")
             
     def getValidBypasses(self) -> list:
         return self.position.getValidBypasses()
