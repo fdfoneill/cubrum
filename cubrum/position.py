@@ -71,6 +71,19 @@ class PointPosition:
     def copy(self) -> "PointPosition":
         return PointPosition(mapLocation=self.mapLocation, map=self.map, orientation=self.orientation, distanceToDestination=self.distanceToDestination)
     
+    def isSameLocation(self, other:"PointPosition") -> bool:
+        """Returns whether two PointPositions are in the same location, regardless of orientation"""
+        if self.getPositionType()=="node" and other.getPositionType()=="node":
+            if self.mapLocation==other.mapLocation:
+                return True 
+        if self.getPositionType()=="edge" and other.getPositionType()=="edge":
+            if set(self.mapLocation)==set(other.mapLocation):
+                if (self.orientation==other.orientation) and (self.distanceToDestination==other.distanceToDestination):
+                    return True
+                if (self.orientation!=other.orientation) and (round(self.getDescription()['distance']-self.distanceToDestination, 2)==other.distanceToDestination):
+                    return True
+        return False
+
     def getPositionType(self) -> str:
         if type(self.mapLocation)==tuple:
             return "edge"
@@ -101,13 +114,13 @@ class PointPosition:
 
     def setOrientation(self, orientation:str) -> None:
         self.validate()
-        assert orientation in self.getValidOrientations(), "valid orientations are {}, got '{}'".format(self.getValidOrientations(), orientation)
+        # assert orientation in self.getValidOrientations(), "valid orientations are {}, got '{}'".format(self.getValidOrientations(), orientation)
         try:
             if self.getPositionType()=="edge":
                 assert orientation in self.mapLocation, "node '{}' is not an endpoint of edge '{}'".format(orientation, self.mapLocation)
                 if orientation != self.orientation:
                     new_orientation = orientation
-                    new_distance_to_destination = self.getDescription()['distance'] - self.distanceToDestination
+                    new_distance_to_destination = round(self.getDescription()['distance'] - self.distanceToDestination, 2)
                 else:
                     new_orientation = orientation
                     new_distance_to_destination = self.distanceToDestination
@@ -121,6 +134,8 @@ class PointPosition:
         except AssertionError as e:
             raise InvalidActionError(e)
         self.orientation = new_orientation
+        if new_distance_to_destination is not None:
+            new_distance_to_destination = round(new_distance_to_destination, 2)
         self.distanceToDestination = new_distance_to_destination
 
     def reverseCourse(self) -> None:
@@ -130,7 +145,7 @@ class PointPosition:
         if not self.orientation:
             raise InvalidActionError("Cannot reverse course when orientation is not set")
         new_orientation = self.getOrigin()
-        new_distance_to_destination = self.getDescription()['distance'] - self.distanceToDestination
+        new_distance_to_destination = round(self.getDescription()['distance'] - self.distanceToDestination, 2)
         self.setOrientation(new_orientation)
         self.distanceToDestination = new_distance_to_destination
 
@@ -152,7 +167,7 @@ class PointPosition:
                 try:
                     assert toward in self.mapLocation, "'{}' is not part of edge '{}'".format(toward, self.mapLocation)
                     self.orientation = toward 
-                    self.distanceToDestination = (self.map.edges[self.mapLocation]['distance'] - self.distanceToDestination)
+                    self.distanceToDestination = round(self.map.edges[self.mapLocation]['distance'] - self.distanceToDestination, 2)
                 except AssertionError as e:
                     raise InvalidActionError(e)
             if self.distanceToDestination <= 0:
@@ -161,7 +176,7 @@ class PointPosition:
                 self.distanceToDestination = None
                 return None
             if distance >= self.distanceToDestination:
-                remaining_movement = distance - self.distanceToDestination
+                remaining_movement = round(distance - self.distanceToDestination, 2)
                 self.distanceToDestination = 0
                 reached_destination = self.map.nodes[self.orientation]
                 if reached_destination.get("strongholdType"):
@@ -297,7 +312,7 @@ class ColumnPosition:
                         if self.vanPosition.orientation==self.rearPosition.orientation: # oriented the same way
                             assert self.vanPosition.distanceToDestination<=self.rearPosition.distanceToDestination, "rearPosition ahead of vanPosition"
                         else: # oriented opposite ways, only valid if "shrinking"
-                            assert self.vanPosition.distanceToDestination>(self.rearPosition.getDescription()['distance']-self.rearPosition.distanceToDestination), "rearPosition oriented away from vanPosition"
+                            assert self.vanPosition.distanceToDestination>round(self.rearPosition.getDescription()['distance']-self.rearPosition.distanceToDestination, 2), "rearPosition oriented away from vanPosition"
                 elif self.vanPosition.getPositionType()=="node": # van node, rear edge
                     assert self.vanPosition.mapLocation in self.rearPosition.mapLocation, "no waypoints, but vanPosition node '{}' is not part of rearPosition edge '{}'".format(self.vanPosition.mapLocation, self.rearPosition.mapLocation)
                     assert self.rearPosition.orientation==self.vanPosition.mapLocation, "rearPosition not oriented toward vanPosition"
@@ -307,6 +322,14 @@ class ColumnPosition:
                     assert self.vanPosition.orientation!=self.rearPosition.mapLocation, "vanPosition cannot shrink towards static rearPosition"
         except AssertionError as e:
             raise InvalidPositionError(e)
+
+    def isSameLocation(self, other:"ColumnPosition") -> bool:
+        """Returns whether two ColumnPositions are in exactly the same location, regardless of disposition"""
+        if (self.vanPosition.isSameLocation(other.vanPosition)) and (self.rearPosition.isSameLocation(other.rearPosition)):
+            return True 
+        if (self.vanPosition.isSameLocation(other.rearPosition)) and (self.rearPosition.isSameLocation(other.vanPosition)):
+            return True 
+        return False
 
     def getCurrentLength(self) -> float:
         """Return current extent of column"""
@@ -343,7 +366,7 @@ class ColumnPosition:
             except InvalidActionError:
                 pass
         else:
-            tempVan.setOrientation(None)
+            tempVan.setOrientation(tempVan.mapLocation)
         tempRear = self.vanPosition.copy()
         if tempRear.getPositionType()=="edge":
             try:
@@ -409,11 +432,13 @@ class ColumnPosition:
             raise InvalidActionError("Cannot set orientation of column with vanPosition '{}', rearPosition '{}', and waypoints '{}' to '{}'".format(self.vanPosition.mapLocation, self.rearPosition.mapLocation, self.waypoints, new_orientation))
         self.validate()
 
-    def reform(self) -> None:
+    def reform(self, maxLength:float=None) -> None:
+        if maxLength is None:
+            maxLength = self.columnLength
         if self.vanPosition.getPositionType()=="node" and self.rearPosition.getPositionType()=="node":
             if self.vanPosition.mapLocation!= self.rearPosition.mapLocation:
                 self.rearPosition.move(0.015) # move out about 100 yards so we don't have van and rear in different nodes
-        overstretch = self.getCurrentLength() - self.columnLength
+        overstretch = round(self.getCurrentLength() - maxLength, 2)
         if overstretch <=0:
             return
         iteration = 0
@@ -421,7 +446,7 @@ class ColumnPosition:
             iteration += 1
             log.debug("iteration {} of reforming, overstretch={}".format(iteration, overstretch))
             arrived_somewhere = self.rearPosition.move(overstretch)
-            new_overstretch = self.getCurrentLength() - self.columnLength
+            new_overstretch = round(self.getCurrentLength() - maxLength, 2)
             if new_overstretch >= overstretch:
                 return InvalidPositionError("attempting to reform is making overstretch worse")
             overstretch = new_overstretch
@@ -590,7 +615,7 @@ class ColumnPosition:
                     if (other.distanceToDestination >= self.vanPosition.distanceToDestination) and (other.distanceToDestination <= self.rearPosition.distanceToDestination):
                         return True
                 else:
-                    if (other.getDescription()['distance']-other.distanceToDestination >= self.vanPosition.distanceToDestination) and (other.getDescription()['distance']-other.distanceToDestination <= self.rearPosition.distanceToDestination):
+                    if (round(other.getDescription()['distance']-other.distanceToDestination, 2) >= self.vanPosition.distanceToDestination) and (round(other.getDescription()['distance']-other.distanceToDestination, 2) <= self.rearPosition.distanceToDestination):
                         return True
             elif (self.vanPosition.getPositionType()=="edge") and (set(other.mapLocation)==set(self.vanPosition.mapLocation)): # on vanPosition's edge
                 if (len(self.waypoints)==0 or (self.vanPosition.orientation!=self.waypoints[0])): # not shrinking
@@ -599,7 +624,7 @@ class ColumnPosition:
                         if other.distanceToDestination >= self.vanPosition.distanceToDestination:
                             return True
                     else: # facing opposite directons
-                        if (other.getDescription()['distance']-other.distanceToDestination) >= self.vanPosition.distanceToDestination:
+                        if round(other.getDescription()['distance']-other.distanceToDestination, 2) >= self.vanPosition.distanceToDestination:
                             return True
                 else: # shrinking
                     # check if it falls in the same part of the edge
@@ -607,7 +632,7 @@ class ColumnPosition:
                         if other.distanceToDestination <= self.vanPosition.distanceToDestination:
                             return True
                     else: # facing opposite directons
-                        if (other.getDescription()['distance']-other.distanceToDestination) <= self.vanPosition.distanceToDestination:
+                        if round(other.getDescription()['distance']-other.distanceToDestination, 2) <= self.vanPosition.distanceToDestination:
                             return True
             elif (self.rearPosition.getPositionType()=="edge") and (set(other.mapLocation)==set(self.rearPosition.mapLocation)): # on rearPosition's edge
                 # check if it falls in the same part of the edge
@@ -615,7 +640,7 @@ class ColumnPosition:
                     if other.distanceToDestination <= self.rearPosition.distanceToDestination:
                         return True
                 else: # facing opposite directions
-                    if (other.getDescription()['distance']-other.distanceToDestination) <= self.rearPosition.distanceToDestination:
+                    if round(other.getDescription()['distance']-other.distanceToDestination, 2) <= self.rearPosition.distanceToDestination:
                         return True
             if len(self.waypoints)>1:
                 for i in range(1, len(self.waypoints)):
@@ -635,7 +660,48 @@ class ColumnPosition:
                 return True
         return False
     
+    def touchingColumn(self, other:"ColumnPosition") -> bool:
+        """Returns whether columns touching endpoints but not overlapping"""
+        if self.isSameLocation(other):
+            if self.vanPosition.isSameLocation(self.rearPosition):
+                return True
+            else: # self and other overlapping 
+                return False
+        elif self.vanPosition.isSameLocation(other.vanPosition):
+            if (self.containsPoint(other.rearPosition)) and (not other.rearPosition.isSameLocation(other.vanPosition)):
+                return False 
+            if (other.containsPoint(self.rearPosition)) and (not self.rearPosition.isSameLocation(self.vanPosition)):
+                return False 
+            return True
+        elif self.vanPosition.isSameLocation(other.rearPosition):
+            if (self.containsPoint(other.vanPosition)) and (not other.rearPosition.isSameLocation(other.vanPosition)):
+                return False 
+            if (other.containsPoint(self.rearPosition)) and (not self.rearPosition.isSameLocation(self.vanPosition)):
+                return False 
+            return True
+        elif self.rearPosition.isSameLocation(other.vanPosition):
+            if (self.containsPoint(other.rearPosition)) and (not other.rearPosition.isSameLocation(other.vanPosition)):
+                return False 
+            if (other.containsPoint(self.vanPosition)) and (not self.rearPosition.isSameLocation(self.vanPosition)):
+                return False 
+            return True
+        elif self.rearPosition.isSameLocation(other.rearPosition):
+            if (self.containsPoint(other.vanPosition)) and (not other.rearPosition.isSameLocation(other.vanPosition)):
+                return False 
+            if (other.containsPoint(self.vanPosition)) and (not self.rearPosition.isSameLocation(self.vanPosition)):
+                return False 
+            return True
+        elif self.vanPosition.orientation in [other.vanPosition.mapLocation, other.rearPosition.mapLocation]+other.waypoints:
+            if self.vanPosition.distanceToDestination==0:
+                return True 
+        elif other.vanPosition.orientation in [self.vanPosition.mapLocation, self.rearPosition.mapLocation]+self.waypoints:
+            if other.vanPosition.distanceToDestination==0:
+                return True 
+        return False
+
     def getDistance(self, other:"ColumnPosition") -> float:
+        if self.touchingColumn(other):
+            return 0
         if self.intersectsColumn(other):
             return -1
         min_distance = None
@@ -646,3 +712,37 @@ class ColumnPosition:
                     min_distance = pair_distance
         return round(min_distance, 2)
     
+    def deconflictFrom(self, other:"ColumnPosition") -> None:
+        if not self.intersectsColumn(other):
+            raise InvalidActionError("cannot deconflict non-intersecting ColumnPositions")
+        elif self.isSameLocation(other): # perfect overlap 
+            if self.orientation:
+                if (self.vanPosition.distanceToDestination is None) or (self.vanPosition.distanceToDestination<=self.columnLength):
+                    self.march(distance=self.columnLength)
+                else: # see if there's room to deconflict in the other direction
+                    self.reverseCourse()
+                    if (self.vanPosition.distanceToDestination is None) or (self.vanPosition.distanceToDestination<=self.columnLength):
+                        self.march(distance=self.columnLength)
+                    else:
+                        raise InvalidPositionError("failed to deconflict same-location ColumnPositions")
+            else: # shared node, no orientation
+                if other.orientation: # try to grab orientation from other
+                    self.setOrientation(other.orientation)
+                    return self.deconflictFrom(other)
+                else: # admit defeat
+                    raise InvalidPositionError("failed to deconflict, ColumnPositions share a node but no orientation set")
+        elif self.containsPoint(other.vanPosition) and self.containsPoint(other.rearPosition): # self fully contains other
+            self.reform(maxLength=0)
+            self.reverseCourse()
+            self.march(distance=self.getDistance(other))
+        elif other.containsPoint(self.vanPosition) and (other.containsPoint(self.rearPosition)): # other fully contains self
+            other.deconflictFrom(self) 
+        elif other.containsPoint(self.vanPosition): # only van is within other 
+            self.reverseCourse()
+            self.reform(maxLength=0)
+            self.reverseCourse()
+            self.march(distance=self.getDistance(other)) 
+        elif other.containsPoint(self.rearPosition): # only rear is within other 
+            self.reform(maxLength=0)
+            self.reverseCourse()
+            self.march(distance=self.getDistance(other))
