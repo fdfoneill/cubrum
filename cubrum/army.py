@@ -109,7 +109,7 @@ class Army:
     
     def getStrength(self, setting:str="FIELD") -> int:
         """Calculate effective strength of this army in a given setting"""
-        assert setting in ["FIELD", "SEIGEATTACK", "SIEGEDEFEND"], "'setting' must be one of FIELD, SIEGEATTACK, or SIEGEDEFEND, got '{}'".format(setting)
+        assert setting in ["FIELD", "SIEGEATTACK", "SIEGEDEFEND"], "'setting' must be one of FIELD, SIEGEATTACK, or SIEGEDEFEND, got '{}'".format(setting)
         strength_total = 0
         for formation in self.formations:
             strength_total += formation.getStrength(setting=setting)
