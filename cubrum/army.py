@@ -19,6 +19,7 @@ class Army:
     
     Attributes:
         name:str
+        allegience:str
         commander:cubrum.commander.Commander
         formations:list
         morale:int
@@ -46,23 +47,25 @@ class Army:
         toGarrison() -> dict
     """
     @staticmethod 
-    def fromGarrison(garrison:dict, map:Map, stronghold:str) -> "Army":
+    def fromGarrison(garrison:dict, map:Map, stronghold:str, allegience:str=None) -> "Army":
         """Parse stronghold garrison to Army object"""
         name = garrison['name']
         infantryCount = garrison.get("infantryCount", 0)
         cavalryCount = garrison.get("cavalryCount", 0) 
+        garrisonAllegience = allegience or ""
         garrisonCommander = Commander(name=name, age=30, title="commander of the", culture=None)
         garrisonFormations = []
         if infantryCount > 0:
             garrisonFormations.append(Formation("{} infantry".format(name),infantryCount,wagonCount=0,cavalry=False,heavy=False))
         if cavalryCount > 0:
             garrisonFormations.append(Formation("{} cavalry".format(name),cavalryCount,wagonCount=0,cavalry=True,heavy=False))
-        garrisonArmy = Army(name, garrisonFormations, garrisonCommander, supply=0, startingStronghold=stronghold, map=map, noncombattantPercent=0, isGarrison=True)
+        garrisonArmy = Army(name, garrisonAllegience, garrisonFormations, garrisonCommander, supply=0, startingStronghold=stronghold, map=map, noncombattantPercent=0, isGarrison=True)
         return garrisonArmy
 
 
-    def __init__(self, name:str, formations:list, commander:Commander, supply:int, startingStronghold:str, map:Map, morale:int=7, noncombattantPercent:int=25, isGarrison=False):
+    def __init__(self, name:str, allegience:str, formations:list, commander:Commander, supply:int, startingStronghold:str, map:Map, morale:int=7, noncombattantPercent:int=25, isGarrison=False):
         self.name = str(name)
+        self.allegience=allegience
         self.map = map
         self.commander = commander
         self.formations = list(formations)
@@ -147,8 +150,11 @@ class Army:
         capacity_noncombattants = self.getNoncombattantCount() * 15
         return capacity_warriors + capacity_noncombattants
         
-    def getSupplyConsumption(self, period="DAY") -> int:
-        assert period in ["DAY", "WEEK"], "'period' must be one of DAY or WEEK, got '{}'".format(period)
+    def getSupplyConsumption(self, days:int=1) -> int:
+        total_consumption = 0
+        for formation in self.formations:
+            total_consumption += formation.getSupplyConsumption(days=days)
+        return total_consumption
         
     def getNoncombattantCount(self) -> int:
         """Calculate current number of noncombattants attached to the army"""
