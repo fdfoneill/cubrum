@@ -2,7 +2,7 @@ import logging, os
 logging.basicConfig(level=os.environ.get("LOGLEVEL","INFO"))
 log = logging.getLogger(__name__)
 
-import json
+import datetime, json
 import numpy as np
 import networkx as nx
 from networkx.classes.graph import Graph
@@ -23,21 +23,12 @@ class Map(Graph):
         getShortestPath(start, end) -> list
         getPathLength(path) -> int
     """
-    def addNodes(self, node_list) -> None:
-        """Add nodes to underlying graph object
-
-        ***
-
-        Parameters:
-            node_list: list of lists. Each item is a 2-tuple, with the first
-                item as the node name, and the second a dictionary of 
-                node attributes.
-        """
-        node_json = node_list.copy()
-        self.add_nodes_from(node_json)
+    def fillDefaults(self):
         for node in self.nodes:
             # set name
             self.nodes[node]['name']=node
+            self.nodes[node]['taxed']=self.nodes[node].get("taxed", [])
+            self.nodes[node]['levied']=self.nodes[node].get("levied", [])
             # default supply
             if self.nodes[node].get("maxSupply") is None:
                 if self.nodes[node].get('strongholdType')=="city":
@@ -68,6 +59,22 @@ class Map(Graph):
                     self.nodes[node]['garrison'] = {'name':'{} garrison'.format(node), 'infantryCount':250}
                 elif self.nodes[node].get('strongholdType')=="fortress":
                     self.nodes[node]['garrison'] = {'name':'{} garrison'.format(node), 'infantryCount':250, 'cavalryCount':50}
+        for edge in self.edges:
+            self.edges[edge]['foraged'] = self.edges[edge].get("foraged", []) 
+
+    def addNodes(self, node_list) -> None:
+        """Add nodes to underlying graph object
+
+        ***
+
+        Parameters:
+            node_list: list of lists. Each item is a 2-tuple, with the first
+                item as the node name, and the second a dictionary of 
+                node attributes.
+        """
+        node_json = node_list.copy()
+        self.add_nodes_from(node_json)
+        self.fillDefaults()
 
     def addEdges(self, edge_list) -> None:
         """Add edges to underlying graph object
@@ -83,9 +90,7 @@ class Map(Graph):
         for e in edge_json:
             e[2]['start'] = e[0]
         self.add_edges_from(edge_json)
-        for node in self.nodes:
-            # set name
-            self.nodes[node]['name']=node
+        self.fillDefaults()
 
     def addNodesFromFile(self, json_file_path) -> None:
         with open(json_file_path, 'r') as rf:
