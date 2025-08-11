@@ -38,7 +38,7 @@ class Formation:
     
     def getStrength(self, setting:str) -> int:
         """Calculate the effective strength of this formation in a given setting"""
-        assert setting in ["FIELD", "SEIGEATTACK", "SIEGEDEFEND"], "'setting' must be one of FIELD, SIEGEATTACK, or SIEGEDEFEND, got '{}'".format(setting)
+        assert setting in ["FIELD", "SIEGEATTACK", "SIEGEDEFEND"], "'setting' must be one of FIELD, SIEGEATTACK, or SIEGEDEFEND, got '{}'".format(setting)
         if setting=="FIELD":
             if self.cavalry and self.heavy:
                 return 4 * self.warriorCount 
