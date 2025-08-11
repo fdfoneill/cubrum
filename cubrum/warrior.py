@@ -10,11 +10,12 @@ class Warrior:
     Attributes:
         name:str
         age:int
-        title:str
-        rank:int
         culture:cubrum.culture.Culture
         
     Methods:
         
     """
-    pass
+    def __init__(self, name:str, age:int, culture=None):
+        self.name = name
+        self.age = int(age)
+        self.culture = culture
