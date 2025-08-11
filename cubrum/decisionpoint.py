@@ -44,6 +44,10 @@ class ArmySighted(DecisionPoint):
     pass
 
 
+class ArmyEngaged(DecisionPoint):
+    pass
+
+
 class BattleResolved(DecisionPoint):
     pass
 
