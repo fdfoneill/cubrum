@@ -716,28 +716,34 @@ class ColumnPosition:
         if not self.intersectsColumn(other):
             raise InvalidActionError("cannot deconflict non-intersecting ColumnPositions")
         elif self.isSameLocation(other): # perfect overlap 
-            if self.orientation:
-                self.vanPosition = other.vanPosition.copy()
-                self.rearPosition = other.rearPosition.copy()
-                self.reverseCourse()
+            if self.getMotion()!="holding": # self has an orientation
+                if self.vanPosition.getPositionType()=="node":
+                    self.move(distance=0.01)
+                    self.reform(maxLength=0)
+                    self.reverseCourse()
+                    self.move(self.vanPosition.distanceToDestination)
+                else:
+                    self.vanPosition=other.vanPosition.copy()
+                    self.rearPosition=other.rearPosition.copy()
+                    self.reform(maxLength=0)
+                    self.reverseCourse()
             else: # shared node, no orientation
-                if other.orientation: # try to grab orientation from other
-                    self.setOrientation(other.orientation)
-                    return self.deconflictFrom(other)
+                if other.getMotion()!="holding": # try to grab orientation from other
+                    return other.deconflictFrom(self)
                 else: # admit defeat
                     raise InvalidPositionError("failed to deconflict, ColumnPositions share a node but no orientation set")
         elif self.containsPoint(other.vanPosition) and self.containsPoint(other.rearPosition): # self fully contains other
             self.reform(maxLength=0)
             self.reverseCourse()
-            self.march(distance=self.getDistance(other))
+            self.move(distance=self.getDistance(other))
         elif other.containsPoint(self.vanPosition) and (other.containsPoint(self.rearPosition)): # other fully contains self
             other.deconflictFrom(self) 
         elif other.containsPoint(self.vanPosition): # only van is within other 
             self.reverseCourse()
             self.reform(maxLength=0)
             self.reverseCourse()
-            self.march(distance=self.getDistance(other)) 
+            self.move(distance=self.getDistance(other)) 
         elif other.containsPoint(self.rearPosition): # only rear is within other 
             self.reform(maxLength=0)
             self.reverseCourse()
-            self.march(distance=self.getDistance(other))
+            self.move(distance=self.getDistance(other))
