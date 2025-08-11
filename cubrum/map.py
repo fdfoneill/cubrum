@@ -63,11 +63,11 @@ class Map(Graph):
             # default garrison, update to use Formation objects
             if self.nodes[node].get("garrison") is None:
                 if self.nodes[node].get('strongholdType')=="city":
-                    self.nodes[node]['garrison'] = [Formation(**{'name':'{} garrison infantry'.format(node), 'cavalry':False, 'warriorCount':500, 'wagonCount':0})]
+                    self.nodes[node]['garrison'] = {'name':'{} garrison'.format(node), 'infantryCount':500}
                 elif self.nodes[node].get('strongholdType')=="town":
-                    self.nodes[node]['garrison'] = [Formation(**{'name':'{} garrison infantry'.format(node), 'cavalry':False, 'warriorCount':250, 'wagonCount':0})]
+                    self.nodes[node]['garrison'] = {'name':'{} garrison'.format(node), 'infantryCount':250}
                 elif self.nodes[node].get('strongholdType')=="fortress":
-                    self.nodes[node]['garrison'] = [Formation(**{'name':'{} garrison infantry'.format(node),'cavalry':False,'warriorCount':250, 'wagonCount':0}),Formation(**{'name':'{} garrison cavalry'.format(node),'cavalry':True,'warriorCount':50, 'wagonCount':0})]
+                    self.nodes[node]['garrison'] = {'name':'{} garrison'.format(node), 'infantryCount':250, 'cavalryCount':50}
 
     def addEdges(self, edge_list) -> None:
         """Add edges to underlying graph object
