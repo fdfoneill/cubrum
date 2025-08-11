@@ -41,9 +41,9 @@ class Army:
         getDestination() -> str
         setDestination() -> None
         march() -> DecisionPoint
-        def getValidBypasses() -> list[str]
+        getValidBypasses() -> list[str]
         applyCasualties() -> None
-        
+        toGarrison() -> dict
     """
     @staticmethod 
     def fromGarrison(garrison:dict, map:Map, stronghold:str) -> "Army":
@@ -222,3 +222,12 @@ class Army:
                 self.formations[i].applyCasualties(count=counts_by_formation[i])
         except AssertionError as e:
             raise ValueError(e)
+        
+    def toGarrison(self):
+        if not self.isGarrison:
+            raise ValueError("cannot convert to garrison when isGarrison is False")
+        g = {}
+        g['name'] = self.name
+        g['infantryCount'] = self.countInfantry()
+        g['cavalryCount'] = self.countCavalry()
+        return g
