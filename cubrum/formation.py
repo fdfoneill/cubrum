@@ -95,14 +95,14 @@ class Formation:
         wagon_capacity = self.wagonCount * 1000
         return warrior_capacity + wagon_capacity
     
-    def getSupplyConsumption(self) -> int:
+    def getSupplyConsumption(self, days:int=1) -> int:
         """Calculate daily consumption of supply for the formation"""
         if self.cavalry:
             warrior_consumption = self.warriorCount * 10
         else:
             warrior_consumption = self.warriorCount * 1
         wagon_consumption = self.wagonCount * 10
-        return warrior_consumption + wagon_consumption
+        return (warrior_consumption + wagon_consumption) * days
     
     def applyCasualties(self, count:int=None, percent:int=None) -> None:
         try:
