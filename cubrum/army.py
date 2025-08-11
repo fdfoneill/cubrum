@@ -37,6 +37,7 @@ class Army:
         getLength() -> float
         getSupplyMax() -> int
         getSupplyConsumption() -> int
+        isSupplyLow() -> bool
         getNoncombattantCount() -> int
         getValidDestinations() -> list[str]
         getDestination() -> str
@@ -44,6 +45,9 @@ class Army:
         march() -> DecisionPoint
         getValidBypasses() -> list[str]
         applyCasualties() -> None
+        raiseMorale() -> None
+        lowerMorale() -> None 
+        checkMorale() -> int
         toGarrison() -> dict
     """
     @staticmethod 
@@ -155,6 +159,15 @@ class Army:
         for formation in self.formations:
             total_consumption += formation.getSupplyConsumption(days=days)
         return total_consumption
+    
+    def isSupplyLow(self, days_threshold:int=1) -> bool:
+        """Returns True if the army has less than 1 day of supply"""
+        current_supply = self.supply 
+        days_supply = self.getSupplyConsumption(days=days_threshold)
+        if days_supply >= current_supply:
+            return True 
+        else:
+            return False
         
     def getNoncombattantCount(self) -> int:
         """Calculate current number of noncombattants attached to the army"""
@@ -228,6 +241,20 @@ class Army:
                 self.formations[i].applyCasualties(count=counts_by_formation[i])
         except AssertionError as e:
             raise ValueError(e)
+        
+    def raiseMorale(self, amount:int=1):
+        self.morale = min(self.morale+amount, 12)
+
+    def lowerMorale(self, amount:int=1):
+        self.morale = max(self.morale-amount, 0)
+        
+    def checkMorale(self) -> int:
+        """Returns 0 on a success, else roll result"""
+        die_result = np.random.randint(1,7)+np.random.randint(1,7)
+        if die_result <= self.morale:
+            return 0
+        else:
+            return die_result
         
     def toGarrison(self):
         if not self.isGarrison:
