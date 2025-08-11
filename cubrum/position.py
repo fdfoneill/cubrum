@@ -717,14 +717,9 @@ class ColumnPosition:
             raise InvalidActionError("cannot deconflict non-intersecting ColumnPositions")
         elif self.isSameLocation(other): # perfect overlap 
             if self.orientation:
-                if (self.vanPosition.distanceToDestination is None) or (self.vanPosition.distanceToDestination<=self.columnLength):
-                    self.march(distance=self.columnLength)
-                else: # see if there's room to deconflict in the other direction
-                    self.reverseCourse()
-                    if (self.vanPosition.distanceToDestination is None) or (self.vanPosition.distanceToDestination<=self.columnLength):
-                        self.march(distance=self.columnLength)
-                    else:
-                        raise InvalidPositionError("failed to deconflict same-location ColumnPositions")
+                self.vanPosition = other.vanPosition.copy()
+                self.rearPosition = other.rearPosition.copy()
+                self.reverseCourse()
             else: # shared node, no orientation
                 if other.orientation: # try to grab orientation from other
                     self.setOrientation(other.orientation)
