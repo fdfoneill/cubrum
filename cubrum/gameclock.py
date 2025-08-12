@@ -71,4 +71,5 @@ class GameClock:
             return DayBreaks()
         if (int(self.playerTimes[player].strftime("%H")) >= SUNSET) and (int((self.playerTimes[player]-time_delta).strftime("%H")) < SUNSET):
             return NightFalls()
+        self.updateMasterTime()
         
