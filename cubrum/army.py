@@ -27,6 +27,8 @@ class Army:
         noncombattantPercent:int
         position:cubrum.position.ColumnPosition
         isGarrison:bool
+        isEncamped:bool 
+        forcedMarchDays:int
         
     Methods:
         getForces() -> dict
