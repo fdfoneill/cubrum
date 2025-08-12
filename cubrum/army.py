@@ -67,7 +67,7 @@ class Army:
         return garrisonArmy
 
 
-    def __init__(self, name:str, allegience:str, formations:list, commander:Commander, supply:int, startingStronghold:str, map:Map, morale:int=7, noncombattantPercent:int=25, isGarrison=False, playerID:int=None):
+    def __init__(self, name:str, allegience:str, formations:list, commander:Commander, supply:int, startingStronghold:str, map:Map, morale:int=7, noncombattantPercent:int=25, isGarrison=False):
         self.name = str(name)
         self.allegience=allegience
         self.map = map
@@ -81,7 +81,6 @@ class Army:
         rear_position = PointPosition(startingStronghold, map)
         self.position = ColumnPosition(vanPosition=van_position, rearPosition=rear_position, columnLength=self.getLength())
         self.isGarrison=isGarrison
-        self.playerID = playerID
         
     def __repr__(self) -> str:
         repr_string = "Army("

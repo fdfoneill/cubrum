@@ -23,4 +23,4 @@ class Warrior:
         self.age = int(age)
         assert self.age>0, "age must be positive, got {}".format(self.age)
         self.culture = culture
-        self.id = int(id)
+        self.id = int(id) if id is not None else None

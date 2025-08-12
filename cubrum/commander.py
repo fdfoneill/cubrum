@@ -47,8 +47,8 @@ class Commander(Warrior):
     Methods:
         
     """
-    def __init__(self, name:str, age:int, title:str, pedigree:str=None, culture:Culture=None, commanderTraits:list=None):
-        super().__init__(name, age, culture)
+    def __init__(self, name:str, age:int, title:str, pedigree:str=None, culture:Culture=None, commanderTraits:list=None, id:int=None):
+        super().__init__(name, age, culture, id=id)
         self.title=title
         self.pedigree=pedigree
         self.commanderTraits = (commanderTraits or [])
