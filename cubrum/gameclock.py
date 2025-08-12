@@ -27,6 +27,9 @@ class GameClock:
         self.masterTime = startTime 
         self.playerTimes = {p:startTime for p in players}
 
+    def __repr__(self):
+        return self.masterTime.strftime("%Y-%m-%d:%H00")
+
     def addPlayer(self, playerID:int):
         """Add a new player to time tracking"""
         assert playerID not in self.playerTimes.keys(),"player '{}' already exists".format(playerID)
