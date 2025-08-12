@@ -14,3 +14,6 @@ class InvalidPositionError(Exception):
 
 class NoPathError(Exception):
     pass
+
+class NoSuchPlayerError(Exception):
+    pass

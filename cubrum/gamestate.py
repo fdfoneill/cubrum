@@ -9,6 +9,7 @@ from .gameclock import GameClock
 from .messagehandler import MessageHandler
 from .map import Map
 from .army import Army
+from .exceptions import NoSuchPlayerError
 
 COPPERCOAST_NODES_PATH = os.path.join(os.path.dirname(__file__), "mapdata", "coppercoast_strongholds.json")
 COPPERCOAST_ROADS_PATH = os.path.join(os.path.dirname(__file__), "mapdata", "coppercoast_roads.json")
@@ -58,6 +59,12 @@ class GameState:
         self.armies = []
         self.playerToArmy = {}
 
+    def __repr__(self):
+        repr_string = "<GameState: "
+        repr_string+=str(self.clock)
+        repr_string+=">"
+        return repr_string
+
     def addPlayer(self, playerName:str) -> int:
         """Pass a player name, get a new player ID"""
         new_id = self.addCorrespondent(correspondentName=playerName, validRecipient=True)
@@ -67,6 +74,15 @@ class GameState:
     
     def getPlayers(self) -> list:
         return list(self.playerToArmy.keys())
+    
+    def getPlayerName(self, playerID:int) -> str:
+        try:
+            matching_correspondents = self.correspondents.loc[self.correspondents['ID']==playerID, "name"]
+            assert len(matching_correspondents)>0, "player with ID={} not found".format(playerID)
+            assert len(matching_correspondents)==1, "multiple records returned for ID={}".format(playerID)
+            return str(matching_correspondents.iloc[0])
+        except AssertionError as e:
+            raise NoSuchPlayerError(e)
 
     def addArmy(self, newArmy:Army, playerID:int=None) -> int:
         if playerID:
@@ -96,6 +112,10 @@ class GameState:
     
     def getMessages(self, playerID:int) -> pd.DataFrame:
         """Return subset of messages addressed to player that have been recieved at current time"""
+        try:
+            assert playerID in self.getPlayers(), "player with ID={} not found".format(playerID)
+        except AssertionError as e:
+            raise NoSuchPlayerError(e)
         messages_addressed = self.messages.akashicRecords.loc[self.messages.akashicRecords['recipientID']==playerID]
         messages_recieved = messages_addressed.loc[messages_addressed['receiptDate'] != None]
         messages_recieved = messages_recieved.loc[messages_addressed['receiptDate'] <= self.clock.getPlayerTime(playerID)]
