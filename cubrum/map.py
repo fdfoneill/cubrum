@@ -8,6 +8,7 @@ import networkx as nx
 from networkx.classes.graph import Graph
 
 from .formation import Formation
+from .exceptions import NoPathError
 
 
 class Map(Graph):
@@ -130,7 +131,10 @@ class Map(Graph):
             if exclusion_function(self.nodes[u],self.nodes[v],d):
                 return None
             return d['distance']
-        shortest_path = nx.shortest_simple_paths(self, start, end, weight=weight_function).__next__()
+        try:
+            shortest_path = nx.shortest_simple_paths(self, start, end, weight=weight_function).__next__()
+        except:
+            raise NoPathError("Cannot find path between '{}' and '{}'".format(start, end))
         return shortest_path
     
     def getPathLength(self, path:list) -> int:
