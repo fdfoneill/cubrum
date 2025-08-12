@@ -32,6 +32,7 @@ class GameState:
 
     Methods:
         addPlayer() -> int
+        getPlayers() -> list
         addArmy() -> int
         addCorrespondent() -> int
         getRecipients() -> pandas.DataFrame
@@ -63,6 +64,9 @@ class GameState:
         self.clock.addPlayer(new_id)
         self.playerToArmy[new_id] = None
         return new_id
+    
+    def getPlayers(self) -> list:
+        return list(self.playerToArmy.keys())
 
     def addArmy(self, newArmy:Army, playerID:int=None) -> int:
         if playerID:
