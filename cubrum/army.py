@@ -83,11 +83,12 @@ class Army:
         self.isGarrison=isGarrison
         
     def __repr__(self) -> str:
-        repr_string = "Army("
-        for unit_type, unit_count in self.getForces().items():
-            repr_string += "{} {}, ".format(unit_count, unit_type)
-        repr_string = repr_string[:-2]+")"
-        return repr_string
+        # repr_string = "Army("
+        # for unit_type, unit_count in self.getForces().items():
+        #     repr_string += "{} {}, ".format(unit_count, unit_type)
+        # repr_string = repr_string[:-2]+")"
+        # return repr_string
+        return self.name
         
     def getForces(self) -> dict:
         """Return dictionary counting each type of troop within army"""
