@@ -26,6 +26,11 @@ class GameClock:
     def __init__(self, startTime:datetime.datetime, players:list):
         self.masterTime = startTime 
         self.playerTimes = {p:startTime for p in players}
+
+    def addPlayer(self, playerID:int):
+        """Add a new player to time tracking"""
+        assert playerID not in self.playerTimes.keys(),"player '{}' already exists".format(playerID)
+        self.playerTimes[playerID] = self.masterTime
         
     def updateMasterTime(self):
         """Set master time to latest of all player times"""
