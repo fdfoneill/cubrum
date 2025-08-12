@@ -18,8 +18,9 @@ class Warrior:
     Methods:
         
     """
-    def __init__(self, name:str, age:int, culture:Culture=None):
+    def __init__(self, name:str, age:int, culture:Culture=None, id:int=None):
         self.name = name
         self.age = int(age)
         assert self.age>0, "age must be positive, got {}".format(self.age)
         self.culture = culture
+        self.id = int(id)
