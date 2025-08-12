@@ -5,6 +5,7 @@ log = logging.getLogger(__name__)
 import datetime
 
 from .gamestate import GameState
+from .exceptions import InvalidActionError
 
 
 class PlayerAction:
@@ -17,13 +18,17 @@ class PlayerAction:
         actionName: name of chosen action 
         startDate: date action was taken
     """
-    def __init__(self, playerID:int, actionName:str, startDate:datetime.datetime):
+    def __init__(self, playerID:int, actionName:str):
         self.id = playerID
         self.actionName = str(actionName)
-        self.startDate = startDate
 
     def apply(self, state:GameState):
         pass
+
+    def isValid(self, state:GameState) -> bool:
+        if self.id not in state.getPlayers():
+            return False 
+        return True
 
 
 class AbandonStronghold(PlayerAction):
@@ -78,8 +83,8 @@ class LevyTroops(PlayerAction):
     pass
 
 
-class MarchArmy(PlayerAction):
-    pass 
+class MakeCamp(PlayerAction):
+    pass
 
 
 class OccupyStronghold(PlayerAction):
