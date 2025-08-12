@@ -32,8 +32,8 @@ class MessageHandler:
                 "creationLocation":[],
                 "receiptDate":[],
                 "text":[],
-                "sender":[],
-                "recipient":[],
+                "senderID":[],
+                "recipientID":[],
                 "link":[]
             }
         )
@@ -46,7 +46,7 @@ class MessageHandler:
     def __repr__(self):
         return self.akashicRecords.__repr__()
 
-    def addLetter(self, text:str, senderName:str, recipientName:str, creationDate:datetime.datetime, creationPosition:Union[PointPosition, ColumnPosition], recipientPosition:Union[PointPosition, ColumnPosition], map:Map, messengerSpeed:float=1, safeDeliveryPercent:int=80) -> int:
+    def addLetter(self, text:str, senderID:str, recipientID:str, creationDate:datetime.datetime, creationPosition:Union[PointPosition, ColumnPosition], recipientPosition:Union[PointPosition, ColumnPosition], map:Map, messengerSpeed:float=1, safeDeliveryPercent:int=80) -> int:
         """Adds a LETTER record to the messageHandler, and an EVENT record if the letter will be lost along the way
         """
         # extract vanPositions 
@@ -74,8 +74,8 @@ class MessageHandler:
             "creationLocation":creation_location_string,
             "receiptDate":receiptDate,
             "text":text,
-            "sender":senderName,
-            "recipient":recipientName,
+            "senderID":senderID,
+            "recipientID":recipientID,
             "link":None
             }
         self.akashicRecords.loc[letter_id] = new_message
@@ -99,8 +99,8 @@ class MessageHandler:
             "creationLocation":creation_location_string,
             "recieptDate":None,
             "text":text,
-            "sender":None,
-            "recipient":None,
+            "senderID":0,
+            "recipientID":None,
             "link":link
         }
         self.akashicRecords.loc[event_id] = new_message
