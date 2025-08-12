@@ -58,7 +58,7 @@ class Commander(Warrior):
     def __repr__(self):
         repr_string = "{} {}".format(self.title, self.name)
         if self.pedigree:
-            repr_string += " {}".format(self.pedigree)
+            repr_string += ", {}".format(self.pedigree)
         return repr_string
     
     def getRelationship(self, isFemale:bool=False, maxIndex:int=None) -> tuple:
@@ -72,9 +72,9 @@ class Commander(Warrior):
             maxIndex: upper bound on random table
         """
         relationship_results = [
-            ("Child", 14+rollD6(3, sum=True)),
-            ("Sibling", 20+rollD20(2, sum=True)),
-            ("Parent", 30+rollD20(3, sum=True)),
+            ("Daughter" if isFemale else "Son", 14+rollD6(3, sum=True)),
+            ("Sister" if isFemale else "Son", 20+rollD20(2, sum=True)),
+            ("Mother" if isFemale else "Father", 30+rollD20(3, sum=True)),
             ("Niece" if isFemale else "Nephew", 16+rollD20(1, sum=True)),
             ("Aunt" if isFemale else "Uncle", 30+rollD20(3, sum=True)),
             ("Cousin", 20+rollD20(2, sum=True)),
@@ -104,3 +104,19 @@ class Commander(Warrior):
             return tuple([t[1]+t[0] for t in zip(("-in-Law", 0), self.getRelationship(isFemale=isFemale, maxIndex=5))])
         else:
             return relationship_results[index_choice]
+        
+    def getSubordinate(self, culture:Culture=None) -> "Commander":
+        if culture is None:
+            culture = self.culture
+        relationship, age = self.getRelationship()
+        rank_self = culture.getTitleRank(self.title)
+        rank_min = max(1, rank_self)
+        rank_max = min(len(culture.titles), rank_min+2)
+        title = culture.generateTitle(minRank=rank_min, maxRank=rank_max)
+        name = culture.generateName()
+        pedigree = "{} of {} {}".format(relationship, self.title, self.name)
+        n_commander_traits = min(max(0, age-10)//10, len(COMMANDER_TRAITS))
+        commander_traits = [str(trait) for trait in np.random.choice(COMMANDER_TRAITS, size=n_commander_traits, replace=False)]
+        subordinate_commander = Commander(name=name, age=age, title=title, pedigree=pedigree, culture=culture, commanderTraits=commander_traits)
+        return subordinate_commander
+        
