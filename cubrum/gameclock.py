@@ -20,7 +20,7 @@ class GameClock:
         
     Methods:
         updateMasterTime()
-        getActivePlayer() -> str
+        getActivePlayer() -> int
         incrementPlayerTime() -> None
     """
     def __init__(self, startTime:datetime.datetime, players:list):
@@ -41,7 +41,7 @@ class GameClock:
                 latest_time = player_time
         self.masterTime=latest_time
         
-    def getActivePlayer(self) -> str:
+    def getActivePlayer(self) -> int:
         """Return player with earliest time"""
         active_player = None
         earliest_time = None
@@ -52,24 +52,28 @@ class GameClock:
                 active_player=p
         return active_player
     
-    def incrementPlayerTime(self, player:str, hours:int) -> DecisionPoint:
+    def getPlayerTime(self, playerID:int) -> datetime.datetime:
+        assert playerID in self.playerTimes.keys(), "player id '{}' not found in GameClock".format(playerID)
+        return self.playerTimes[playerID]
+    
+    def incrementPlayerTime(self, playerID:int, hours:int) -> DecisionPoint:
         """Add hours to a player's current time
         
         ***
         
         Parameters:
-            player: string ID of player
+            playerID: integer ID of player
             hours: how many hours to increment player's clock
             
         Returns:
             if crossing dawn, DayBreaks. if crossing dusk, NightFalls. else None
         """
-        assert player in self.playerTimes.keys(), "player '{}' not being tracked".format(player)
+        assert playerID in self.playerTimes.keys(), "player '{}' not being tracked".format(playerID)
         time_delta = datetime.timedelta(hours=hours)
-        self.playerTimes[player] = self.playerTimes[player] + time_delta
-        if (int(self.playerTimes[player].strftime("%H")) >= SUNRISE) and (int((self.playerTimes[player]-time_delta).strftime("%H")) < SUNRISE):
+        self.playerTimes[playerID] = self.playerTimes[playerID] + time_delta
+        if (int(self.playerTimes[playerID].strftime("%H")) >= SUNRISE) and (int((self.playerTimes[playerID]-time_delta).strftime("%H")) < SUNRISE):
             return DayBreaks()
-        if (int(self.playerTimes[player].strftime("%H")) >= SUNSET) and (int((self.playerTimes[player]-time_delta).strftime("%H")) < SUNSET):
+        if (int(self.playerTimes[playerID].strftime("%H")) >= SUNSET) and (int((self.playerTimes[playerID]-time_delta).strftime("%H")) < SUNSET):
             return NightFalls()
         self.updateMasterTime()
         
