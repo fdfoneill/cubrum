@@ -57,8 +57,8 @@ class Commander(Warrior):
 
     def __repr__(self):
         repr_string = "{} {}".format(self.title, self.name)
-        if self.pedigree:
-            repr_string += ", {}".format(self.pedigree)
+        # if self.pedigree:
+        #     repr_string += ", {}".format(self.pedigree)
         return repr_string
     
     def getRelationship(self, isFemale:bool=False, maxIndex:int=None) -> tuple:
