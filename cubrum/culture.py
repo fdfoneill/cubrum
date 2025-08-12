@@ -4,7 +4,7 @@ log = logging.getLogger(__name__)
 
 import numpy as np
 
-# Allakian, Delisgrene, Bostite, Boonan, Bemm, Islish
+# Allakian, Delisgrene, Boonan, Dinn, Islish
 
 
 class Culture:
@@ -14,48 +14,181 @@ class Culture:
     
     Attributes:
         cultureName:str
-        titlesMiltary:list
-        titlesNobility:list
-        titlesReligious:list
+        names:list
+        titles:list
         
     Methods:
         generateName() -> str
         generateTitle() -> str
         getTitleRank() -> int
     """
-    def __init__(self, cultureName:str, titlesMiltary:list=None, titlesNobility:list=None, titlesReligious:list=None):
+    def __init__(self, cultureName:str, names:list=None, titles:list=None):
         self.cultureName=cultureName
-        self.titlesMiltary = titlesMiltary or []
-        self.titlesNobility = titlesNobility or []
-        self.titlesReligious = titlesReligious or []
-        
-    def generateSyllable(self):
-        raise NotImplementedError()
-        
-    def generateName(self):
-        raise NotImplementedError()
-        
-    def generateTitle(self, sphere:str, rank_minimum:int=None, rank_maximum:int=None) -> str:
-            if sphere=="military":
-                titles=[t for t in self.titlesMiltary]
-            elif sphere=="nobility":
-                titles=[t for t in self.titlesNobility]
-            elif sphere=="religious":
-                titles=[t for t in self.titlesReligious]
-            else:
-                raise ValueError("sphere must be one of [military, nobility, religious], got '{}'".format(sphere))
-            choices= []
-            for i in range(len(titles)):
-                rank_i = i+1
-                title_i = titles[i]
-                if (rank_i <= rank_minimum) and (rank_i <= rank_maximum) and (title_i is not None):
-                    choices.append(title_i) 
-            return np.random.choice(choices)
-        
+        self.names = names or []
+        self.namesUsed = [False for name in self.names]
+        self.titles = titles or []
+
+    def generateName(self, unusedOnly:bool=True, updateUsed:bool=True) -> str:
+        name_indices = []
+        for i in range(len(self.names)):
+            if (not self.namesUsed[i]) or (not unusedOnly):
+                name_indices.append(i)
+        chosen_index = np.random.choice(name_indices) 
+        chosen_name = self.names[chosen_index]
+        if updateUsed:
+            self.namesUsed[chosen_index] = True 
+        return chosen_name
+
+    def generateTitle(self, minRank:int=None, maxRank:int=None) -> str:
+        if minRank:
+            assert minRank > 0, "rank must be greater than 0"
+            assert minRank <= len(self.titles), "cannot get rank {} from title list with length {}".format(minRank, len(self.titles))
+        else:
+            minRank=0
+        if maxRank:
+            assert maxRank > 0, "rank must be greater than 0"
+            assert maxRank <= len(self.titles), "cannot get rank {} from title list with length {}".format(maxRank, len(self.titles))
+        else:
+            maxRank=len(self.titles)
+        assert minRank <= maxRank, "minRank cannot be greater than maxRank: {}>{}".format(minRank, maxRank)
+        rank_choices = [r for r in range(minRank, maxRank+1)]
+        chosen_rank = np.random.choice(rank_choices)
+        return self.titles[chosen_rank]
+       
     def getTitleRank(self, title:str) -> int:
-        for sphere_titles in [self.titlesMiltary, self.titlesNobility, self.titlesReligious]:
-            for i in range(len(sphere_titles)):
-                if sphere_titles[i] == title:
-                    return i+1
+        if title in self.titles:
+            return self.titles.index(title) 
+        else:
             return -1
             
+
+ALLAKIAN = Culture(
+    "Allakian", 
+    names=[
+        "Malden",
+        "Strough",
+        "Dudek",
+        "Yoman",
+        "Broughan",
+        "Peyker",
+        "Crannan",
+        "Golin",
+        "Jelalk",
+        "Iviss",
+        "Effeth",
+        "Gostin",
+        "Nalgin",
+        "Volish"
+    ],
+    titles=[
+        "Prince",
+        "Baron",
+        "Commodore",
+        "Knight-Captain",
+        "Captain",
+        "Sir"
+    ]
+)
+
+BOONAN = Culture(
+    cultureName="Boonan",
+    names=[
+        "Foolan",
+        "Hoanee",
+        "Mendoo",
+        "Mey",
+        "Drola",
+        "Sonab",
+        "Honiriri",
+        "Joonin",
+        "Boaloo",
+        "Meramab",
+        "Kirunga",
+        "Nkerey"
+    ],
+    titles=[
+        "High Marshall",
+        "Marshall",
+        "Warden",
+        "Captain",
+        "Commander",
+        "Chief"
+    ]
+)
+
+DELISGRENE = Culture(
+    cultureName="Delisgrene",
+    names=[
+        "Voltiziar",
+        "Soman",
+        "Bostion",
+        "Lavran",
+        "Agnos",
+        "Gultiziar",
+        "Triulgin",
+        "Brosh",
+        "Nalish",
+        "Brygost",
+        "Alwis",
+        "Dargren"
+    ],
+    titles=[
+        "Empress",
+        "Duke",
+        "Marquis",
+        "Count",
+        "Lord",
+        "Sir"
+    ]
+)
+
+DINN = Culture(
+    cultureName="Dinn",
+    names=[
+        "Urungar",
+        "Mennar",
+        "Parum",
+        "Nkuga",
+        "Ongum",
+        "Jonjey",
+        "Onga",
+        "Rekiku",
+        "Kirraney",
+        "Irawe",
+        "Arai",
+        "Burawar"
+    ],
+    titles=[
+        "Sultan",
+        "Councillor",
+        "General",
+        "Captain",
+        "Honorable"
+    ]
+)
+
+ISLISH = Culture(
+    cultureName="Islish",
+    names=[
+        "Cratch",
+        "Malkal",
+        "Kalitz",
+        "Rath",
+        "Rabbachir",
+        "Gurm",
+        "Verk",
+        "Petch",
+        "Targitch",
+        "Habbetch",
+        "Gulkir",
+        "Gemz"
+    ],
+    titles=[
+        "Governor",
+        "Headman",
+        "Big Man",
+        "Boss",
+        "Gangboss",
+        "Tough"
+    ]
+)
