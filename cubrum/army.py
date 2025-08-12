@@ -81,6 +81,8 @@ class Army:
         rear_position = PointPosition(startingStronghold, map)
         self.position = ColumnPosition(vanPosition=van_position, rearPosition=rear_position, columnLength=self.getLength())
         self.isGarrison=isGarrison
+        self.isEncamped=False 
+        self.forcedMarchDays=0
         
     def __repr__(self) -> str:
         # repr_string = "Army("
