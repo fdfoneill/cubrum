@@ -33,6 +33,9 @@ class Culture:
         for i in range(len(self.names)):
             if (not self.namesUsed[i]) or (not unusedOnly):
                 name_indices.append(i)
+        if len(name_indices)<1:
+            log.warning("all {} names used, reusing".format(self.cultureName))
+            return self.generateName(unusedOnly=False)
         chosen_index = np.random.choice(name_indices) 
         chosen_name = self.names[chosen_index]
         if updateUsed:
@@ -40,6 +43,7 @@ class Culture:
         return chosen_name
 
     def generateTitle(self, minRank:int=None, maxRank:int=None) -> str:
+        assert len(self.titles) > 0, "no titles from which to generate"
         if minRank:
             assert minRank > 0, "rank must be greater than 0"
             assert minRank <= len(self.titles), "cannot get rank {} from title list with length {}".format(minRank, len(self.titles))
