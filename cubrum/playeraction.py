@@ -4,6 +4,8 @@ log = logging.getLogger(__name__)
 
 import datetime
 
+from .gamestate import GameState
+
 
 class PlayerAction:
     """Class representing an action taken by a player
@@ -15,10 +17,13 @@ class PlayerAction:
         actionName: name of chosen action 
         startDate: date action was taken
     """
-    def __init__(self, player, actionName:str, startDate:datetime.datetime):
-        self.player = player
+    def __init__(self, playerID:int, actionName:str, startDate:datetime.datetime):
+        self.id = playerID
         self.actionName = str(actionName)
         self.startDate = startDate
+
+    def apply(self, state:GameState):
+        pass
 
 
 class AbandonStronghold(PlayerAction):
@@ -34,6 +39,10 @@ class BesiegeStronghold(PlayerAction):
 
 
 class ChallengeCommander(PlayerAction):
+    pass
+
+
+class ChangeDestination(PlayerAction):
     pass
 
 
@@ -78,6 +87,10 @@ class OccupyStronghold(PlayerAction):
 
 
 class PillageStronghold(PlayerAction):
+    pass
+
+
+class Proceed(PlayerAction):
     pass
 
 
