@@ -35,7 +35,7 @@ class Army:
         getStrength() -> int
         getTravelDistance() -> float
         getLength() -> float
-        getSupplyMax() -> int
+        getSupplyCapacity() -> int
         getSupplyConsumption() -> int
         isSupplyLow() -> bool
         getNoncombattantCount() -> int
@@ -146,11 +146,11 @@ class Army:
         army_length = length_warriors + length_noncombattants
         return round(army_length, 2)
     
-    def getSupplyMax(self) -> int:
+    def getSupplyCapacity(self) -> int:
         """Calculate maximum quantity of supply the army can carry"""
         capacity_warriors = 0
         for formation in self.formations:
-            capacity_warriors += formation.getSupplyMax()
+            capacity_warriors += formation.getSupplyCapacity()
         capacity_noncombattants = self.getNoncombattantCount() * 15
         return capacity_warriors + capacity_noncombattants
         
