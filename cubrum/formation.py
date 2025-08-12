@@ -23,18 +23,22 @@ class Formation:
         applyCasualties() -> int
         
     """
-    def __init__(self, name:str, warriorCount:int, wagonCount:int, cavalry:bool=False, heavy:bool=False):
+    def __init__(self, name:str, warriorCount:int, wagonCount:int, cavalry:bool=False, heavy:bool=False, special:str=None):
         self.name = name
         self.warriorCount = int(warriorCount)
         self.wagonCount = int(wagonCount)
         self.cavalry=bool(cavalry)
         self.heavy=bool(heavy)
+        self.special=special
         
     def getDescription(self) -> str:
         """Nicely format unit type (e.g. 'heavy infantry') as a string"""
         weight = "heavy" if self.heavy else "light"
         infantry_or_cavalry = "cavalry" if self.cavalry else "infantry"
-        return "{} {}".format(weight, infantry_or_cavalry)
+        desc_string = "{} {}".format(weight, infantry_or_cavalry)
+        if self.special:
+            desc_string += " ({})".format(self.special)
+        return desc_string
     
     def getStrength(self, setting:str) -> int:
         """Calculate the effective strength of this formation in a given setting"""
