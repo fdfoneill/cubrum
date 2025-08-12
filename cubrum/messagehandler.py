@@ -46,7 +46,7 @@ class MessageHandler:
     def __repr__(self):
         return self.akashicRecords.__repr__()
 
-    def addLetter(self, text:str, senderID:str, recipientID:str, creationDate:datetime.datetime, creationPosition:Union[PointPosition, ColumnPosition], recipientPosition:Union[PointPosition, ColumnPosition], map:Map, messengerSpeed:float=1, safeDeliveryPercent:int=80) -> int:
+    def addLetter(self, text:str, senderID:str, recipientID:str, creationDate:datetime.datetime, creationPosition:Union[PointPosition, ColumnPosition], recipientPosition:Union[PointPosition, ColumnPosition], messengerSpeed:float=1, safeDeliveryPercent:int=80) -> int:
         """Adds a LETTER record to the messageHandler, and an EVENT record if the letter will be lost along the way
         """
         # extract vanPositions 
