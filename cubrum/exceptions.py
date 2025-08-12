@@ -11,3 +11,6 @@ class InvalidBattleError(Exception):
 
 class InvalidPositionError(Exception):
     pass
+
+class NoPathError(Exception):
+    pass
