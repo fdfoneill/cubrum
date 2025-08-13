@@ -34,9 +34,13 @@ class GameState:
     Methods:
         addPlayer() -> int
         getPlayers() -> list
+        getPlayerName() -> str
         addArmy() -> int
         addCorrespondent() -> int
         getRecipients() -> pandas.DataFrame
+        getMessages() -> pandas.DataFrame
+        getActivePlayer() -> int
+        getArmyGeometeries() -> list
         getOptions() -> list
         applyAction() -> 
     """
