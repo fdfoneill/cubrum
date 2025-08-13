@@ -9,7 +9,7 @@ from .gameclock import GameClock
 from .messagehandler import MessageHandler
 from .map import Map
 from .army import Army
-from .exceptions import NoSuchPlayerError
+from .exceptions import InvalidActionError, NoSuchPlayerError
 
 COPPERCOAST_NODES_PATH = os.path.join(os.path.dirname(__file__), "mapdata", "coppercoast_strongholds.json")
 COPPERCOAST_ROADS_PATH = os.path.join(os.path.dirname(__file__), "mapdata", "coppercoast_roads.json")
@@ -162,10 +162,38 @@ class GameState:
         messages_recieved = messages_recieved.loc[messages_addressed['receiptDate'] <= self.clock.getPlayerTime(playerID)]
         return messages_recieved
     
+    def getActivePlayer(self) -> int:
+        """Wrapper around clock.getActivePlayer()"""
+        return self.clock.getActivePlayer()
+    
+    def getArmyGeometries(self) -> list:
+        """Calculate intersections and touchings of all army pairs 
+        ***
+        
+        Returns:
+            army_geometries: list of dicts with list indices corresponding 
+                to indices of armies attribute. Each dict has keys 'touching'
+                and 'intersecting', with list values listing which other Army
+                objects are touching/intersecting the indexed Army
+        """
+        army_geometries = []
+        for i in range(len(self.armies)):
+            army_geometries.append({"touching":[], "intersecting":[]})
+            for j in range(len(self.armies)):
+                if i==j:
+                    continue 
+                if self.armies[i].position.touchingColumn(self.armies[j].position):
+                    army_geometries[i]["touching"].append(self.armies[j])
+                elif self.armies[i].position.intersectsColumn(self.armies[j].position):
+                    army_geometries[i]['intersecting'].append(self.armies[j])
+        return army_geometries
+    
     def getOptions(self, playerID:int) -> list:
         if not playerID in self.getPlayers():
             raise NoSuchPlayerError("player with ID={} not found".format(playerID))
         pass
     
     def applyAction(self, action):
+        if not action.isValid(self):
+            raise InvalidActionError("action '{}' not valid".format(action))
         return action.apply(self)
