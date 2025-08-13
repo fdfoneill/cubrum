@@ -76,9 +76,9 @@ class GameClock:
         assert playerID in self.playerTimes.keys(), "player '{}' not being tracked".format(playerID)
         time_delta = datetime.timedelta(hours=hours)
         self.playerTimes[playerID] = self.playerTimes[playerID] + time_delta
-        if (int(self.playerTimes[playerID].strftime("%H")) >= SUNRISE) and (int((self.playerTimes[playerID]-time_delta).strftime("%H")) < SUNRISE):
-            return DayBreaks()
-        if (int(self.playerTimes[playerID].strftime("%H")) >= SUNSET) and (int((self.playerTimes[playerID]-time_delta).strftime("%H")) < SUNSET):
-            return NightFalls()
         self.updateMasterTime()
+        if (int(self.playerTimes[playerID].strftime("%H")) >= SUNRISE) and (int((self.playerTimes[playerID]-time_delta).strftime("%H")) < SUNRISE):
+            return DayBreaks(playerID=playerID, date=self.getPlayerTime(playerID))
+        if (int(self.playerTimes[playerID].strftime("%H")) >= SUNSET) and (int((self.playerTimes[playerID]-time_delta).strftime("%H")) < SUNSET):
+            return NightFalls(playerID=playerID, date=self.getPlayerTime(playerID))
         

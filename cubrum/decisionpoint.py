@@ -2,6 +2,8 @@ import logging, os
 logging.basicConfig(level=os.environ.get("LOGLEVEL","INFO"))
 log = logging.getLogger(__name__)
 
+import datetime
+
 
 class DecisionPoint:
     """Signals need for player input
@@ -61,7 +63,9 @@ class CrossroadsReached(DecisionPoint):
         
 
 class DayBreaks(DecisionPoint):
-    pass
+    def __init__(self, date:datetime.datetime, playerID:int, **kwargs):
+        super().__init__(trigger="DayBreaks", date=date, playerID=playerID, **kwargs)
+
 
 
 class LetterRecieved(DecisionPoint):
@@ -69,7 +73,8 @@ class LetterRecieved(DecisionPoint):
 
 
 class NightFalls(DecisionPoint):
-    pass
+    def __init__(self, date:datetime.datetime, playerID:int, **kwargs):
+        super().__init__(trigger="NightFalls", date=date, playerID=playerID, **kwargs)
 
 
 class NodeOccupied(DecisionPoint):
