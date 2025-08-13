@@ -22,6 +22,9 @@ class PlayerAction:
         self.playerID = playerID
         self.actionName = str(actionName)
         self.hours=int(hours)
+        
+    def __repr__(self):
+        return "<{}>".format(self.actionName)
 
     def apply(self, state:GameState):
         raise NotImplementedError("PlayerAction is an abstract class")
@@ -33,6 +36,12 @@ class PlayerAction:
             if not state.clock.getActivePlayer()==self.playerID:
                 return False
         return True
+    
+    def getDescription(self):
+        if self.description:
+            return self.description 
+        else:
+            return str(self)
 
 
 class AbandonStronghold(PlayerAction):
