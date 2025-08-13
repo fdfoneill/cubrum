@@ -152,10 +152,11 @@ class GameState:
         Parameters:
             playerID: ID integer of player whose messages should be retrieved
         """
-        try:
-            assert playerID in self.getPlayers(), "player with ID={} not found".format(playerID)
-        except AssertionError as e:
-            raise NoSuchPlayerError(e)
+        if playerID!=0: # system is always valid
+            try:
+                assert playerID in self.getPlayers(), "player with ID={} not found".format(playerID)
+            except AssertionError as e:
+                raise NoSuchPlayerError(e)
         messages_addressed = self.messages.akashicRecords.loc[self.messages.akashicRecords['recipientID']==playerID]
         messages_recieved = messages_addressed.loc[messages_addressed['receiptDate'] != None]
         messages_recieved = messages_recieved.loc[messages_addressed['receiptDate'] <= self.clock.getPlayerTime(playerID)]

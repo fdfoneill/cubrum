@@ -107,10 +107,10 @@ class MessageHandler:
             "messageType":"EVENT",
             "creationDate":creationDate,
             "creationLocation":creation_location_string,
-            "recieptDate":None,
+            "recieptDate":creationDate,
             "text":text,
             "senderID":0,
-            "recipientID":None,
+            "recipientID":0,
             "link":link
         }
         self.akashicRecords.loc[event_id] = new_message

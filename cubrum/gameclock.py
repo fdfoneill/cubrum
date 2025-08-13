@@ -56,6 +56,8 @@ class GameClock:
         return active_player
     
     def getPlayerTime(self, playerID:int) -> datetime.datetime:
+        if playerID==0:
+            return self.masterTime
         assert playerID in self.playerTimes.keys(), "player id '{}' not found in GameClock".format(playerID)
         return self.playerTimes[playerID]
     
