@@ -93,8 +93,10 @@ class MessageHandler:
             # lost_date = creationDate + ((receiptDate-creationDate)/2)
             lost_date = receiptDate
             event_text = "letter lost along the way"
-            return_value = self.addEvent(event_text, lost_date, recipientPosition, link=letter_id)
+            event_id = self.addEvent(event_text, lost_date, recipientPosition, link=letter_id)
             self.akashicRecords.loc[letter_id, "receiptDate"] = None
+            self.akashicRecords.loc[letter_id, "link"] = event_id 
+            return_value = event_id
         return return_value
 
     def addEvent(self, text:str, creationDate:datetime.datetime, creationPosition:PointPosition, link:int=None) -> int:
