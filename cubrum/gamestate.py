@@ -66,16 +66,23 @@ class GameState:
         return repr_string
 
     def addPlayer(self, playerName:str) -> int:
-        """Pass a player name, get a new player ID"""
+        """Takes a player name and returns a new player ID
+        
+        Also adds the new player to the correspondents
+            dataframe, clock, and playerToArmy dictionary 
+            attributes
+        """
         new_id = self.addCorrespondent(correspondentName=playerName, validRecipient=True)
         self.clock.addPlayer(new_id)
         self.playerToArmy[new_id] = None
         return new_id
     
     def getPlayers(self) -> list:
+        """Returns list of valid player ID integers"""
         return list(self.playerToArmy.keys())
     
     def getPlayerName(self, playerID:int) -> str:
+        """Returns string name associated with player ID"""
         try:
             matching_correspondents = self.correspondents.loc[self.correspondents['ID']==playerID, "name"]
             assert len(matching_correspondents)>0, "player with ID={} not found".format(playerID)
@@ -85,6 +92,20 @@ class GameState:
             raise NoSuchPlayerError(e)
 
     def addArmy(self, newArmy:Army, playerID:int=None) -> int:
+        """Adds an Army object to the armies attribute
+
+        ***
+
+        Parameters:
+            newArmy: Army object to be appended to list 
+            playerID: Optional. If provided, sets newArmy.commander.id and 
+                pairs this army with playerID in the playerToArmy attribute.
+                If not set, playerID is instead drawn from newArmy.commander.id
+        
+        Returns:
+            new_army_index: positional index of newly-added Army within
+                armies attribute
+        """
         if playerID:
             newArmy.commander.id = playerID
         else:
@@ -98,6 +119,18 @@ class GameState:
         self.playerToArmy[playerID] = new_army_index
 
     def addCorrespondent(self, correspondentName:str, validRecipient:bool=True) -> int:
+        """Adds a new item to correspondents dataframe
+
+        ***
+        
+        Parameters:
+            correspondentName: string name to associate with correspondent
+            validRecipient: whether this correspondent should be presented as 
+                able to recieve letters. Default True 
+            
+        Returns:
+            correspondent_id: integer ID of newly added correspondent
+        """
         new_id = len(self.correspondents)
         new_correspondent = {
             "ID":int(new_id),
@@ -108,10 +141,17 @@ class GameState:
         return new_id
     
     def getRecipients(self) -> pd.DataFrame:
+        """Return list of correspondents for which validRecipient is True
+        """
         return self.correspondents.loc[self.correspondents["validRecipient"]==True]
     
     def getMessages(self, playerID:int) -> pd.DataFrame:
-        """Return subset of messages addressed to player that have been recieved at current time"""
+        """Return subset of messages addressed to player that have been recieved at current time
+        
+        ***
+        Parameters:
+            playerID: ID integer of player whose messages should be retrieved
+        """
         try:
             assert playerID in self.getPlayers(), "player with ID={} not found".format(playerID)
         except AssertionError as e:
@@ -122,6 +162,8 @@ class GameState:
         return messages_recieved
     
     def getOptions(self, playerID:int) -> list:
+        if not playerID in self.getPlayers():
+            raise NoSuchPlayerError("player with ID={} not found".format(playerID))
         pass
     
     def applyAction(self, action):
