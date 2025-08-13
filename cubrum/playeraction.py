@@ -129,6 +129,7 @@ class Proceed(PlayerAction):
         if res_clock:
             res_clock.updateContext(playerID=self.playerID)
             decision_points.append(res_clock)
+        return decision_points
         
 
 
