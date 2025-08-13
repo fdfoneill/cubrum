@@ -24,7 +24,7 @@ class PlayerAction:
         self.hours=int(hours)
 
     def apply(self, state:GameState):
-        pass
+        raise NotImplementedError("PlayerAction is an abstract class")
 
     def isValid(self, state:GameState) -> bool:
         if self.playerID not in state.getPlayers(): # check player exists
