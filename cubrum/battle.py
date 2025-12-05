@@ -115,7 +115,7 @@ class Battle:
         self.validate()
         modifiers = self.getModifiers()
         side1, side2 = list(modifiers.keys())
-        rolls = {side:np.random.randing(1,7)+np.random.randint(1,7)+modifiers[side] for side in modifiers.key()}
+        rolls = {side:np.random.randint(1,7)+np.random.randint(1,7)+modifiers[side]['value'] for side in modifiers.keys()}
         margin = abs(rolls[side1]-rolls[side2])
         consequences = {side1:{}, side2:{}}
         if rolls[side1]>rolls[side2]:
@@ -141,7 +141,7 @@ class Battle:
         if defeatedSide:
             consequences[defeatedSide]['retreatDistance']=1
             # check rout
-            if self.belligerents[defeatedSide].checkMorale()>0:
+            if self.belligerents[defeatedSide]['army'].checkMorale()>0:
                 consequences[defeatedSide]['rout']=True
                 consequences[defeatedSide]['retreatDistance']=2
                 supplyLostPercent=int(np.random.randint(1,7)*10)
@@ -198,7 +198,7 @@ class BattleResult:
         repr_string = "Battle("
         repr_string += " vs. ".join(v['army'].name for v in self.belligerents.values())
         if self.victoriousSide:
-            repr_string+=("; {} victory")
+            repr_string+=("; {} victory".format(self.victoriousSide))
         else:
             repr_string+=("; draw")
         if self.rout:
