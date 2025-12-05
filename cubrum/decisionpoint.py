@@ -63,8 +63,8 @@ class CrossroadsReached(DecisionPoint):
         
 
 class DayBreaks(DecisionPoint):
-    def __init__(self, date:datetime.datetime, playerID:int, **kwargs):
-        super().__init__(trigger="DayBreaks", date=date, playerID=playerID, **kwargs)
+    def __init__(self, date:datetime.datetime, **kwargs):
+        super().__init__(trigger="DayBreaks", date=date, **kwargs)
 
 
 
@@ -73,8 +73,8 @@ class LetterRecieved(DecisionPoint):
 
 
 class NightFalls(DecisionPoint):
-    def __init__(self, date:datetime.datetime, playerID:int, **kwargs):
-        super().__init__(trigger="NightFalls", date=date, playerID=playerID, **kwargs)
+    def __init__(self, date:datetime.datetime, **kwargs):
+        super().__init__(trigger="NightFalls", date=date, **kwargs)
 
 
 class NodeOccupied(DecisionPoint):

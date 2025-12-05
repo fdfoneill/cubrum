@@ -15,70 +15,91 @@ class GameClock:
     ***
     
     Attributes:
-        masterTime:datetime.datetime 
-        playerTimes:dict
+        # masterTime:datetime.datetime 
+        # playerTimes:dict
+        gameTime:datetime.datetime
         
     Methods:
-        updateMasterTime()
-        getActivePlayer() -> int
-        incrementPlayerTime() -> None
+        # updateMasterTime()
+        # getActivePlayer() -> int
+        # incrementPlayerTime() -> None
+        incrementGameTime() -> None
     """
-    def __init__(self, startTime:datetime.datetime, players:list):
-        self.masterTime = startTime 
-        self.playerTimes = {p:startTime for p in players}
+    def __init__(self, startTime:datetime.datetime): #, players:list):
+        # self.masterTime = startTime 
+        # self.playerTimes = {p:startTime for p in players}
+        self.gameTime=startTime
 
     def __repr__(self):
-        return self.masterTime.strftime("%Y-%m-%d:%H00")
+        # return self.masterTime.strftime("%Y-%m-%d:%H00")
+        return self.gameTime.strftime("%Y-%m-%d:%H00")
 
-    def addPlayer(self, playerID:int):
-        """Add a new player to time tracking"""
-        assert playerID not in self.playerTimes.keys(),"player '{}' already exists".format(playerID)
-        self.playerTimes[playerID] = self.masterTime
+    # def addPlayer(self, playerID:int):
+    #     """Add a new player to time tracking"""
+    #     assert playerID not in self.playerTimes.keys(),"player '{}' already exists".format(playerID)
+    #     self.playerTimes[playerID] = self.masterTime
         
-    def updateMasterTime(self):
-        """Set master time to latest of all player times"""
-        latest_time = self.masterTime
-        for p in self.playerTimes.keys():
-            player_time = self.playerTimes[p]
-            if latest_time < player_time:
-                latest_time = player_time
-        self.masterTime=latest_time
+    # def updateMasterTime(self):
+    #     """Set master time to latest of all player times"""
+    #     latest_time = self.masterTime
+    #     for p in self.playerTimes.keys():
+    #         player_time = self.playerTimes[p]
+    #         if latest_time < player_time:
+    #             latest_time = player_time
+    #     self.masterTime=latest_time
         
-    def getActivePlayer(self) -> int:
-        """Return player with earliest time"""
-        active_player = None
-        earliest_time = None
-        for p in self.playerTimes.keys():
-            player_time = self.playerTimes[p]
-            if (earliest_time is None) or (earliest_time > player_time):
-                earliest_time = player_time
-                active_player=p
-        return active_player
+    # def getActivePlayer(self) -> int:
+    #     """Return player with earliest time"""
+    #     active_player = None
+    #     earliest_time = None
+    #     for p in self.playerTimes.keys():
+    #         player_time = self.playerTimes[p]
+    #         if (earliest_time is None) or (earliest_time > player_time):
+    #             earliest_time = player_time
+    #             active_player=p
+    #     return active_player
     
-    def getPlayerTime(self, playerID:int) -> datetime.datetime:
-        if playerID==0:
-            return self.masterTime
-        assert playerID in self.playerTimes.keys(), "player id '{}' not found in GameClock".format(playerID)
-        return self.playerTimes[playerID]
+    # def getPlayerTime(self, playerID:int) -> datetime.datetime:
+    #     if playerID==0:
+    #         return self.masterTime
+    #     assert playerID in self.playerTimes.keys(), "player id '{}' not found in GameClock".format(playerID)
+    #     return self.playerTimes[playerID]
     
-    def incrementPlayerTime(self, playerID:int, hours:int) -> DecisionPoint:
-        """Add hours to a player's current time
+    # def incrementPlayerTime(self, playerID:int, hours:int) -> DecisionPoint:
+    #     """Add hours to a player's current time
+        
+    #     ***
+        
+    #     Parameters:
+    #         playerID: integer ID of player
+    #         hours: how many hours to increment player's clock
+            
+    #     Returns:
+    #         if crossing dawn, DayBreaks. if crossing dusk, NightFalls. else None
+    #     """
+    #     assert playerID in self.playerTimes.keys(), "player '{}' not being tracked".format(playerID)
+    #     time_delta = datetime.timedelta(hours=hours)
+    #     self.playerTimes[playerID] = self.playerTimes[playerID] + time_delta
+    #     self.updateMasterTime()
+    #     if (int(self.playerTimes[playerID].strftime("%H")) >= SUNRISE) and (int((self.playerTimes[playerID]-time_delta).strftime("%H")) < SUNRISE):
+    #         return DayBreaks(playerID=playerID, date=self.getPlayerTime(playerID))
+    #     if (int(self.playerTimes[playerID].strftime("%H")) >= SUNSET) and (int((self.playerTimes[playerID]-time_delta).strftime("%H")) < SUNSET):
+    #         return NightFalls(playerID=playerID, date=self.getPlayerTime(playerID))
+        
+    def incrementGameTime(self,hours:int) -> DecisionPoint:
+        """Add hours to game's current time
         
         ***
         
         Parameters:
-            playerID: integer ID of player
             hours: how many hours to increment player's clock
             
         Returns:
             if crossing dawn, DayBreaks. if crossing dusk, NightFalls. else None
         """
-        assert playerID in self.playerTimes.keys(), "player '{}' not being tracked".format(playerID)
         time_delta = datetime.timedelta(hours=hours)
-        self.playerTimes[playerID] = self.playerTimes[playerID] + time_delta
-        self.updateMasterTime()
-        if (int(self.playerTimes[playerID].strftime("%H")) >= SUNRISE) and (int((self.playerTimes[playerID]-time_delta).strftime("%H")) < SUNRISE):
-            return DayBreaks(playerID=playerID, date=self.getPlayerTime(playerID))
-        if (int(self.playerTimes[playerID].strftime("%H")) >= SUNSET) and (int((self.playerTimes[playerID]-time_delta).strftime("%H")) < SUNSET):
-            return NightFalls(playerID=playerID, date=self.getPlayerTime(playerID))
-        
+        self.gameTime = self.gameTime + time_delta
+        if (int(self.gameTime.strftime("%H")) >= SUNRISE) and (int((self.gameTime-time_delta).strftime("%H")) < SUNRISE):
+            return DayBreaks(date=self.gameTime)
+        if (int(self.gameTime.strftime("%H")) >= SUNSET) and (int((self.gameTime-time_delta).strftime("%H")) < SUNSET):
+            return NightFalls(date=self.gameTime)
