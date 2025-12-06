@@ -226,10 +226,62 @@ class Army:
             raise InvalidActionError(e)
         
     def retreat(self, hours:float=None, distance:float=None, awayFrom:"Army"=None) -> None:
+        """
+        Docstring for retreat
+
+        When called, Army will retreat for a set number of hours or leagues. If 
+        awayFrom is set, the retreat direction will avoid the passed other 
+        Army object's position.
+
+        ***
+
+        Parameters:
+            hours: hours to march in retreat. Exactly one of hours or distance must be set.
+            distance: leagues to march in retreat. Exactly one of hours or distance must bet set.
+            awayFrom: other Army to retreat from. Retreat will move away from this Army.
+        """
         assert (hours is None) ^ (distance is None), "exactly one of hours or distance must be set"
-        
-        #TODO: Implement
-        raise NotImplementedError("retreat() method not implemented")
+        leagues = distance or self.getTravelDistance(hours=hours, forced=False)
+
+        if awayFrom is not None:
+            enemy_position = awayFrom.position
+            best_orientation = None
+            furthest_distance = None
+            for orientation in self.getValidDestinations():
+                try:
+                    test_column = ColumnPosition(
+                        vanPosition=self.position.vanPosition.copy(),
+                        rearPosition=self.position.rearPosition.copy(),
+                        columnLength=self.position.columnLength,
+                        waypoints=list(self.position.waypoints),
+                    )
+                    test_column.setOrientation(orientation)
+                    test_column.move(leagues)
+                    candidate_distance = test_column.getDistance(enemy_position)
+                except InvalidActionError:
+                    continue
+                if candidate_distance < 0:
+                    continue
+                if (furthest_distance is None) or (candidate_distance > furthest_distance):
+                    furthest_distance = candidate_distance
+                    best_orientation = orientation
+            if best_orientation is None:
+                raise InvalidActionError("no valid retreat path away from enemy")
+            self.position.setOrientation(best_orientation)
+        else:
+            try:
+                self.position.reverseCourse()
+            except InvalidActionError:
+                for destination in self.getValidDestinations():
+                    if destination == self.position.vanPosition.mapLocation:
+                        continue
+                    try:
+                        self.position.setOrientation(destination)
+                        break
+                    except InvalidActionError:
+                        continue
+
+        return self.position.move(leagues)
             
     def getValidBypasses(self) -> list:
         return self.position.getValidBypasses()
