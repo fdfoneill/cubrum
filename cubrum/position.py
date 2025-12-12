@@ -610,6 +610,9 @@ class ColumnPosition:
             if other.mapLocation in [self.vanPosition.mapLocation, self.rearPosition.mapLocation] + self.waypoints:
                 return True 
         else:
+            # if self.vanPosition.getDistance(other) < self.vanPosition.getDistance(self.rearPosition):
+            #     if self.rearPosition.getDistance(other) < self.rearPosition.getDistance(self.vanPosition):
+            #         return True
             if (self.vanPosition.getPositionType()=="edge") and (set(other.mapLocation)==set(self.vanPosition.mapLocation))and (set(other.mapLocation)==set(self.rearPosition.mapLocation)):
                 if other.orientation==self.vanPosition.orientation:
                     if (other.distanceToDestination >= self.vanPosition.distanceToDestination) and (other.distanceToDestination <= self.rearPosition.distanceToDestination):
